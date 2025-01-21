@@ -1,4 +1,4 @@
-$AccountsToKeep = @('Administrator', 'Admin', 'Public', 'Default', 'niagara', 'niagarawater.com\PDQInventory', 'pdqinventory', 'NetworkService', 'LocalService', 'systemprofile')
+$AccountsToKeep = @('Administrator', 'Admin', 'Public', 'Default', 'pdqinventory', 'NetworkService', 'LocalService', 'systemprofile')
 
 $UserProfiles = Get-CimInstance -Class Win32_UserProfile | Where-Object {
     $_.LocalPath.Split('\')[-1] -notin $AccountsToKeep
