@@ -5,7 +5,7 @@
 
 $cred = Get-Credential
 $computer = Read-Host "Enter the computer name"
-$AccountsToKeep = @('Administrator', 'Admin', 'Public', 'Default', 'niagara', 'niagarawater.com\PDQInventory', 'pdqinventory', 'NetworkService', 'LocalService', 'systemprofile')
+$AccountsToKeep = @('Administrator', 'Admin', 'Public', 'Default', 'pdqinventory', 'NetworkService', 'LocalService', 'systemprofile')
 
 Invoke-Command -ComputerName $computer -Credential $cred -ScriptBlock {
     $UserProfiles = Get-CimInstance -Class Win32_UserProfile | Where-Object {
