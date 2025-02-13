@@ -1,7 +1,7 @@
 
 
 # Overview
-This template package enhances application installation directly on devices, ideal for scenarios where Intune installations are hindered by slow network conditions. It optimizes both disk space usage and deployment speed by handling installations locally, which can significantly reduce bandwidth consumption.
+This template package installs applications directly on devices by dumping the MSI or Exe onto the device locally and calling it through powershell. This serves as a way to bypass slow tenant deployments or network issues for when intune is provisioning a device application on a slow network. From what I've noticed it has a higher install success rate and faster overall install. 
 
 # Setup
 - Copy the IntuneAppTemplate directory and rename it to match your application.
