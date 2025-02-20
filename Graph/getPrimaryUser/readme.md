@@ -12,3 +12,6 @@ This collection of scripts demonstrates the progressive use of the Microsoft Gra
 
 # Use case
 My current use case involves gathering device ownership details from a large export of devices. This device list export identifies devices that are reaching end-of-life support on their current operating system builds for our EDR. These devices current OS build will be updated to the newest version, It is necessary to gather a large number of primary user emails for each device to send a business notification to the affected users. 
+
+https://bonguides.com/how-to-fix-get-mguser-one-or-more-errors-occurred/
+For issues related to Get-MgUser
