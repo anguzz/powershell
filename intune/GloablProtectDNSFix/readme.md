@@ -10,4 +10,5 @@ Type: `DWORD`
 
 Value: `2`
 
+Please note that for intune deployments this to be created in the correct registry path and not under the `Computer\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Palo Alto Networks\GlobalProtect\Settings` use the install command `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
 
