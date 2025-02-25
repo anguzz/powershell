@@ -10,7 +10,11 @@ This template package installs applications directly on devices by dumping the M
 - Adjust the install and uninstall scripts for things like the variable names to have these value and also install flags on the exe/msi which both differ.
 - Execute winutil on install.ps1 to prepare for deployment
 
+# Uninstall
+Two uninstall scripts are provided
+ - uninstall.ps1 can be repurposed to use the msi uninstall string or call the exe uninstall directly
+ - uninstall2.ps1 will loop through the software registry and look for the uninstall code based on the apps display name
 
-- Standard MSI flags
 
+ - Standard MSI flags
 `https://learn.microsoft.com/en-us/windows/win32/msi/standard-installer-command-line-options`
