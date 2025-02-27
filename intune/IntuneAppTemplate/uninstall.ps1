@@ -1,30 +1,32 @@
-# This script locates uninstaller files from a target installation directory and performs an uninstallation.
+# add app name here
+$AppName = "app name"
 
-$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+# this searches for the uninstall string at these registry paths
+$RegistryPaths = @(
+    "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall",
+    "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+)
 
-$destinationPath = "C:\Installers\FolderNameHere"  # Specify the folder where installers are located from install.ps1
+$Uninstalled = $false
 
-Start-Sleep -Seconds 5
+foreach ($Path in $RegistryPaths) {
+    $Apps = Get-ChildItem -Path $Path | ForEach-Object {
+        $DisplayName = $_.GetValue("DisplayName")
+        $UninstallString = $_.GetValue("UninstallString")
 
-# Uninstaller file configuration
-$fileName = "uninstallFileExe.txt"  # Specify the uninstaller executable or MSI file name here
-$filePath = Join-Path $destinationPath $fileName
-
-# Command configurations for uninstallation
-$uninstallCommand = '/uninstall /quiet /norestart'
-$msiUninstallCommand = "msiexec.exe /x `"$filePath`" /quiet /norestart"
-
-# Check for the presence of the file and uninstall
-if (Test-Path -Path $filePath) {
-    Write-Output "Uninstalling application from $filePath"
-    if ($filePath -like "*.msi") {
-        # Uninstall MSI package
-        Start-Process -FilePath "msiexec.exe" -ArgumentList "/x `"$filePath`" /quiet /norestart" -Wait
-    } else {
-        # Uninstall using the executable
-        Start-Process -FilePath $filePath -ArgumentList $uninstallCommand -Wait
+        if ($DisplayName -like "*$AppName*") {
+            $Guid = $_.PSChildName
+            if ($Guid -match "^{.*}$") {
+                Write-Host "Uninstalling $DisplayName - $Guid"
+                Start-Process "MsiExec.exe" -ArgumentList "/X$Guid /quiet /norestart" -NoNewWindow -Wait
+                $Uninstalled = $true
+            }
+        }
     }
-    Write-Output "Application uninstalled successfully"
+}
+
+if ($Uninstalled) {
+    Write-Host "Uninstallation completed successfully."
 } else {
-    Write-Output "The file $filePath does not exist."
+    Write-Host "Application '$AppName' not found."
 }
