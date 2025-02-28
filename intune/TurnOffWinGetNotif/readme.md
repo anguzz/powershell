@@ -12,7 +12,8 @@ These settings are specifically tailored to not remove the notifications entirel
 These values can be adjusted client side under `System > Notifications > Application Updates` if WinGet-AutoUpdate is installed on the device. 
 
 # Deployment
-This script is ideal for deployment via Microsoft Intune or similar management tools to ensure a consistent configuration across multiple devices using Winget. Ensure you deploy in a user context silently if deploying via intune as running as system will place in the system's user account. 
+This script is ideal for deployment via Microsoft Intune or similar management tools to ensure a consistent configuration across multiple devices using Winget.
+This package should be run in the user context as deploying via system does not create the registry values, it's also recommended to use the `detection.ps1` script as your rule format rather then manually configuring the detection rule as the HKCU path has trouble being read via manual detection rules through intune.  The install command should be set as `powershell.exe -ex bypass -windowstyle hidden -File install.ps1` when deployed in the user context. 
 
 
 # Complete Notification Disabling
