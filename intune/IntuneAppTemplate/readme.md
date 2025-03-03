@@ -12,15 +12,17 @@ This package contains a collection of templates that perform application install
 
 
 ## Install scripts
-Two installs scripts are provided
+Three installs scripts are provided
  - `install_msi.ps1` which showcases the logic for installing an msi via powershell silently with the appropiate msi flags
  
  - Standard MSI flags
 `https://learn.microsoft.com/en-us/windows/win32/msi/standard-installer-command-line-options`
 
- - install_exe.ps1 which showcases the logic for installing an exe via powershell silently with appropiate or generic exe flags.
+ - `install_exe.ps1` which showcases the logic for installing an exe via powershell silently with appropiate or generic exe flags.
 
 For exe files it will differ per file but the current commands in the install.exe has generic flags commonly supported by well known applications. 
+
+- `install_web.ps1` downloads, extracts, and installs software from a web-supplied ZIP containing an MSI. Cleans up after installation to free up space. Modify $downloadUrl and $downloadPath as needed. Script assumes a single MSI file in the ZIP. Run with administrative privileges. 
 
 ## Uninstall scripts
 Two uninstall scripts are provided
