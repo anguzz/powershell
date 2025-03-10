@@ -24,3 +24,7 @@ This repository includes two PowerShell scripts that demonstrate how to interact
 
 - Ensure the API URL and properly escapes special characters in PowerShell using ``$apiURL = "https://graph.microsoft.com/v1.0/users/$userEmail`?`$select=$selectProperties"`` to ensure successful queries specicially using backticks ` 
 
+## Script 4: 
+- Similar to script 3 but using a different property (UserID rather then email) to create an excel sheet 
+- Exports User Details by User ID 
+`https://graph.microsoft.com/v1.0/users/$userId?$select=userPrincipalName,officeLocation,onPremisesDistinguishedName`

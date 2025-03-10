@@ -1,0 +1,2 @@
+# Overview
+This PowerShell script connects to the Microsoft Graph API to retrieve information about the users currently logged on to specified devices within an organization. It imports a list of device IDs from a CSV file, makes API requests to gather user logon details for each device, and exports the gathered information to a CSV file.
