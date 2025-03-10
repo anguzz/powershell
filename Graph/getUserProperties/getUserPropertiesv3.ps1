@@ -8,21 +8,24 @@ foreach ($user in $users) {
     $userEmail = $user.emailAddress
     Write-Host "Processing: $userEmail"  # Added for visibility
 
-    $selectProperties = "mail,officeLocation,onPremisesDistinguishedName" #select string for  properties
+    $email = $userEmail  
+    $officeLocation = "Not Found"  # default value if the location is not found
+    $onPremisesDN = "Not Found"  # default value if the DN is not found
+
+    $selectProperties = "mail,officeLocation,onPremisesDistinguishedName"
     $apiURL = "https://graph.microsoft.com/v1.0/users/$userEmail`?`$select=$selectProperties"
 
     try {
         $response = Invoke-MgGraphRequest -Method GET -Uri $apiURL -OutputType PSObject
         if ($response) {
-            $email = $response.mail
-            $officeLocation = $response.officeLocation
-            $onPremisesDN =$response.onPremisesDistinguishedName
-
-
-            $results += [PSCustomObject]@{
-                Email = $email
-                OfficeLocation = $officeLocation
-                OnPremisesDistinguishedName = $onPremisesDN
+            if ($response.mail) {
+                $email = $response.mail
+            }
+            if ($response.officeLocation) {
+                $officeLocation = $response.officeLocation
+            }
+            if ($response.onPremisesDistinguishedName) {
+                $onPremisesDN = $response.onPremisesDistinguishedName
             }
         } else {
             Write-Host "No data returned for: $userEmail"
@@ -30,6 +33,13 @@ foreach ($user in $users) {
     } catch {
         Write-Error "Failed to fetch data for $userEmail"
     }
+
+    $results += [PSCustomObject]@{
+        Email = $email
+        OfficeLocation = $officeLocation
+        OnPremisesDistinguishedName = $onPremisesDN
+    }
 }
 
+# Export results to CSV
 $results | Export-Csv -Path "./userOffices.csv" -NoTypeInformation
