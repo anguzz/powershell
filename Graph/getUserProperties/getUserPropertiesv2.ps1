@@ -6,21 +6,26 @@ $results = @()
 
 foreach ($user in $users) {
     $userEmail = $user.emailAddress
-    Write-Host "Processing: $userEmail" 
+    Write-Host "Processing: $userEmail"  #  for visibility
 
     $apiURL = "https://graph.microsoft.com/v1.0/users/$userEmail"
 
+    $email = $userEmail  # use emailAddress from original sheet
+    $officeLocation = "Not Found"  # add default value if the location is not found
+
     try {
         $response = Invoke-MgGraphRequest -Method GET -Uri $apiURL -OutputType PSObject
-        $email = $response.mail
-        $officeLocation = $response.officeLocation
-
-        $results += [PSCustomObject]@{
-            Email = $email
-            OfficeLocation = $officeLocation
+        if ($response -and $response.mail -and $response.officeLocation) {
+            $email = $response.mail
+            $officeLocation = $response.officeLocation
         }
     } catch {
         Write-Error "Failed to fetch data for $userEmail"
+    }
+
+    $results += [PSCustomObject]@{
+        Email = $email
+        OfficeLocation = $officeLocation
     }
 }
 

@@ -14,6 +14,13 @@ This repository includes two PowerShell scripts that demonstrate how to interact
 - Imports a list of user emails from a CSV file (`Import-Csv`).
 - Loops through each user, fetching details with `Invoke-MgGraphRequest`.
 - Converts responses into PowerShell custom objects (`PSObject`).
-- Handles errors gracefully with a `try-catch` block.
+- Handles errors with a `try-catch` block.
 - Exports collected data (emails and office locations) to an output CSV file (`Export-Csv`).
+
+## Script 3: Multiple Users Information 
+- Advanced Query Parameters: Constructs the API URL with multiple select properties using the `$select` query, which allows the script to fetch specific properties like `onPremisesDistinguishedName` 
+
+- example string `$selectProperties = "mail,officeLocation,onPremisesDistinguishedName"` 
+
+- Ensure the API URL and properly escapes special characters in PowerShell using ``$apiURL = "https://graph.microsoft.com/v1.0/users/$userEmail`?`$select=$selectProperties"`` to ensure successful queries specicially using backticks ` 
 
