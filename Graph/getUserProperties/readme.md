@@ -1,4 +1,4 @@
-# Microsoft Graph API Scripts
+
 
 ## Overview
 This repository includes two PowerShell scripts that demonstrate how to interact with Microsoft Graph API to fetch user details and process them as specific PowerShell objects.
