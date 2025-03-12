@@ -28,3 +28,10 @@ This repository includes two PowerShell scripts that demonstrate how to interact
 - Similar to script 3 but using a different property (UserID rather then email) to create an excel sheet 
 - Exports User Details by User ID 
 `https://graph.microsoft.com/v1.0/users/$userId?$select=userPrincipalName,officeLocation,onPremisesDistinguishedName`
+- Input: UserIDs CSV
+- Output: UserDetails CSV, including  userPrincipalName(email)  officeLocation,  onPremisesDistinguishedName
+
+## Script 5:
+- Stripped down version of script 4 to go from UserID to email and create an excel sheet 
+- Input: UserIDs CSV
+- Output: UserEmails CSV
