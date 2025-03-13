@@ -1,17 +1,13 @@
-#simple showcase of how to add an object(device) to a group on entra
-
 Import-Module Microsoft.Graph.Groups
 
 Connect-MgGraph -Scopes "User.Read", "Group.ReadWrite.All", "Directory.ReadWrite.All"
 
-#pass in device/group ids here 
-#easily  found on entra portal in the url 
-$GroupId = ""  
-$DeviceId = "" 
 
+$GroupId = "" # entra group id  
+$DeviceId = "" #entra object ID on entra admin portal
 
 $params = @{
-    "@odata.id" = "https://graph.microsoft.com/v1.0/directoryObjects/$DeviceId"
+    "@odata.id" = "https://graph.microsoft.com/beta/devices/$DeviceId"
 }
 
 try {

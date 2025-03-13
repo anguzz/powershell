@@ -1,6 +1,15 @@
-#add many devices based off display name to a group on entra
-#use the devices.csv file format
+#adds a list of devices in a csv by their host name to an entra group
+#currently endpoint does not work
+#see devices.csv for format
+
+
 Connect-MgGraph -Scopes "User.Read", "Group.ReadWrite.All", "Directory.ReadWrite.All"
+
+
+$GroupId = "" #add group id from entra here
+$csvPath = Join-Path -Path $PSScriptRoot -ChildPath "devices.csv" #change to appropiate file name,
+$devices = Import-Csv -Path $csvPath
+
 
 function Get-DeviceIdByDisplayName {
     param(
@@ -13,6 +22,8 @@ function Get-DeviceIdByDisplayName {
     } else {
         Write-Host "No device found with display name: $DisplayName"
         return $null
+        #this return code returns null if display name is not found 
+        #in turn leads 
     }
 }
 
@@ -22,9 +33,12 @@ function Add-DeviceToGroup {
         [string]$DeviceId
     )
 
+    $deviceUrl = "https://graph.microsoft.com/v1.0/directoryObjects/$DeviceId"
+    Write-Host "Attempting to add device to group with URL: $deviceUrl"
+
     $params = @{
-        "@odata.id" = "https://graph.microsoft.com/v1.0/devices/$DeviceId"
-    }
+        "@odata.id" = $deviceUrl
+    } | ConvertTo-Json -Depth 1
 
     try {
         New-MgGroupMemberByRef -GroupId $GroupId -BodyParameter $params
@@ -36,10 +50,7 @@ function Add-DeviceToGroup {
     }
 }
 
-$GroupId = "" 
 
-$csvPath = Join-Path -Path $PSScriptRoot -ChildPath "devices.csv"
-$devices = Import-Csv -Path $csvPath
 
 foreach ($device in $devices) {
     $DeviceId = Get-DeviceIdByDisplayName -DisplayName $device.DeviceName

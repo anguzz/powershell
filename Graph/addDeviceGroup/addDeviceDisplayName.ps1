@@ -1,7 +1,6 @@
-#showcase of how to add a devices display name to a group to an entra group
 
 Connect-MgGraph -Scopes "User.Read", "Group.ReadWrite.All", "Directory.ReadWrite.All"
-function Add-DeviceToGroup {
+function Add-DeviceToGroup { 
     param(
         [string]$GroupId,
         [string]$DeviceId
