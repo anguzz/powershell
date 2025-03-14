@@ -85,4 +85,9 @@ if ($null -eq $groupMembers.value -or $groupMembers.value.Count -eq 0) {
     }
 }
 
-$csvData | Export-Csv -Path "managed_devices_report.csv" -NoTypeInformation
+$currentDate = Get-Date -Format "MM-dd-yyyy"
+
+$csvPath = "managed_devices_report_$currentDate.csv"
+
+$csvData | Export-Csv -Path $csvPath -NoTypeInformation
+
