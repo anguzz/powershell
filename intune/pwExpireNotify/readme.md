@@ -5,7 +5,10 @@ For personal or small-scale enterprise use, it is possible to configure a Graph 
 
 
 # Overview
-This PowerShell package enhances security for organizations using Microsoft 365 by checking the password expiration status of the current user and alerting them with a popup message. It automatically attaches the domain's standard email to the user's UPN to make a Graph API call and check the last password change date against the organization's password policy. 
+This PowerShell package enhances security for organizations using Microsoft 365 by checking the password expiration status of the current user and alerting them with a popup message. It automatically attaches the domain's standard email to the user's UPN to make a Graph API call and check the last password change date against the organization's password policy.  
+
+![image](https://github.com/user-attachments/assets/306360fb-6e4a-42b7-afb3-44854191115b)
+
 
 # Features
 - Automatically fetches the currently signed-in user's UPN.
