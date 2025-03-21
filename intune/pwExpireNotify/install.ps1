@@ -1,5 +1,5 @@
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$destinationPath = "C:\pwExpireNotify" 
+$destinationPath = "C:\pwExpireNotify"  #Point to a location users do not have permissions to access
 
 
 $logFile = Join-Path $destinationPath "installLog.txt"

@@ -2,6 +2,10 @@
 
 Connect-MgGraph -Scopes "User.Read.All"
 
+$accessToken = ""#add your applications access token here
+Connect-MgGraph -AccessToken ($accessToken |ConvertTo-SecureString -AsPlainText -Force) 
+
+
 $currentUser = $env:USERNAME
 $PasswordPolicyInterval = 90
 $userPrincipalName = "$currentUser@fbmsales.com"

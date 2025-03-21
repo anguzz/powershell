@@ -1,7 +1,6 @@
 # Disclaimer
-This project has been discontinued due to deployment challenges. The `Connect-MgGraph` module currently requires interactive authentication, which makes it unsuitable for silent installations or for fetching password expiration data without user interaction. Although the script functions well for individual testing on a personal machine, deploying it on a larger scale within an enterprise environment is not feasible without interactive input, or hard coding in authentication which is not secure. 
+This project has been discontinued due to deployment challenges. The `Connect-MgGraph` module currently requires interactive authentication, which makes it unsuitable for silent installations or for fetching password expiration data without user interaction. The alternative is configure an Entra app with limited read access to manage authentication more securely through an access token in the script however, deploying this solution to client devices via intune security risks and is not advised. If you do follow this approach ensure that the `$destinationPath` in `install.ps1` is pointed at a directory users cannot access to minimize risk.
 
-For personal or small-scale enterprise use, it is possible to configure a Graph app with read access to manage authentication more securely through hardcoded values in the script however, deploying this solution to client devices with variables for Entra read access poses security risks and is not advised. I am looking into alternatives but this serves as a proof of concept that you can setup client side notifications for password expirations on user machines with graph. 
 
 
 # Overview
@@ -13,8 +12,13 @@ This PowerShell package enhances security for organizations using Microsoft 365 
 - Compares this date with your organization's password policy to determine if the password is nearing expiration.
 
 # Usage
-- Replace `$userPrincipalName = "$currentUser@email.com"` with your domain's standard naming convention. 
+- Replace `$userPrincipalName = "$currentUser@email.com"` and `$emailExtension` with your domain's standard naming convention. 
 - Set your organization's password expiration interval in the script, e.g., `$PasswordPolicyInterval = 90`
+- Add an access token in `notify.ps1` at
+```powershell
+$accessToken = ""
+Connect-MgGraph -AccessToken ($accessToken |ConvertTo-SecureString -AsPlainText -Force) 
+```
 
 # Authentication
 This script requires device authentication and should be executed with permissions adequate for reading user profiles. It is intended for deployment on managed devices but can be adapted for other setups by configuring a Graph app with the necessary permissions.
