@@ -1,6 +1,7 @@
 $AccessTokenName = "GRAPH_PW_EXPIRE_TOKEN"
-$destinationPath = "C:\Program Files (x86)\pwExpireNotifyClient"
-$logFile = Join-Path $destinationPath "uninstallLog.txt"
+$destinationPath = "" #add destination here
+$logFilePath = "C:\logs"
+$logFile = Join-Path $logFilePath "uninstall_pw_notify_expire_Log.txt"
 
 # removes the scheduled task
 try {
