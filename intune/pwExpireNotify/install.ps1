@@ -17,7 +17,7 @@ $modules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 foreach ($module in $modules) {
     if (-not (Get-Module -ListAvailable -Name $module)) {
         try {
-            Install-Module -Name $module -Force -Scope CurrentUser -WarningAction SilentlyContinue -ErrorAction SilentlyContinue | Out-Null
+            Install-Module -Name $module -Force -Scope AllUsers -WarningAction SilentlyContinue -ErrorAction SilentlyContinue | Out-Null
             Add-Content -Path $logFile -Value "Installed $module module."
         } catch {
             Add-Content -Path $logFile -Value "Failed to install $module module: $_"
