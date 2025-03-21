@@ -6,7 +6,10 @@ $AccessTokenString = [System.Environment]::GetEnvironmentVariable($AccessTokenNa
 Connect-MgGraph -AccessToken ($AccessTokenString |ConvertTo-SecureString -AsPlainText -Force) -NoWelcome -ErrorAction stop 
 
 $domainEmailExtension="@mydomain.com"
-$currentUser = $env:USERNAME
+$currentUser = $currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
+#$currentUser = $env:USERNAME 
+#similiar to this but system cannot see current user if ran via intune as system
+
 $PasswordPolicyInterval = 90
 $userPrincipalName = "$currentUser$domainEmailExtension"
 
