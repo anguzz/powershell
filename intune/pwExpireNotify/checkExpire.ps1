@@ -1,38 +1,39 @@
 # Start-Sleep -Seconds 120 #to allow device to connect to network properly, etc
 
-Connect-MgGraph -Scopes "User.Read.All"
+$AccessTokenName= "GRAPH_PW_EXPIRE_TOKEN" #set in the install script
+$AccessTokenString = [System.Environment]::GetEnvironmentVariable($AccessTokenName, [System.EnvironmentVariableTarget]::Machine)
 
-$accessToken = ""#add your applications access token here
-Connect-MgGraph -AccessToken ($accessToken |ConvertTo-SecureString -AsPlainText -Force) 
+Connect-MgGraph -AccessToken ($AccessTokenString |ConvertTo-SecureString -AsPlainText -Force) -NoWelcome -ErrorAction stop 
 
-
+$domainEmailExtension="@mydomain.com"
 $currentUser = $env:USERNAME
 $PasswordPolicyInterval = 90
-$userPrincipalName = "$currentUser@fbmsales.com"
+$userPrincipalName = "$currentUser$domainEmailExtension"
 
-$wshell = New-Object -ComObject Wscript.Shell 
 
 Write-Output "`n`n================================================================================================`n`n"
 Write-Output "User Principal Name: $userPrincipalName"
 
 $UserDetails = Get-MgUser -Filter "UserPrincipalName eq '$userPrincipalName'" -Property "DisplayName,LastPasswordChangeDateTime" | Select-Object DisplayName, LastPasswordChangeDateTime
 
+
 if ($null -ne $UserDetails.LastPasswordChangeDateTime) {
     $lastChangeDate = [datetime]$UserDetails.LastPasswordChangeDateTime
     $daysSinceLastChange = (Get-Date) - $lastChangeDate
     $daysRemaining = $PasswordPolicyInterval - $daysSinceLastChange.Days
-    Write-Output "Days remaining: $daysRemaining"
+ 
 
-    if ($daysRemaining -le 0) {
-        Write-Output "The password has expired or today is the expiration day."
-        $wshell.Popup("Your password has expired or today is the expiration day. `n`n`You can update your password from any browser at https://myaccount.microsoft.com ",0,"Done",0x0)        
+
+    if ($daysRemaining -le 0)  {
+        Write-Output "The password has expired or today is the expiration day." #this condition will only occur day of, otherwise user is locked out. 
+        & .\popup.ps1 -DaysRemaining $daysRemaining #calls my popup script and passes in the days remaining from our api call
 
     } elseif ($daysRemaining -le 10) {
         Write-Output "The password will expire in $daysRemaining days. Consider changing it soon."
-        $wshell.Popup("Your password will expire in $daysRemaining days. `n`n`You can update your password from any browser at https://myaccount.microsoft.com ",0,"Done",0x0)        
+        & .\popup.ps1 -DaysRemaining $daysRemaining #calls my popup script and passes in the days remaining from our api call
     } else {
         Write-Output "Password is within policy limits. ($daysRemaining days left until expiration)"
-        $wshell.Popup( "TEST - Password is within policy limits. ($daysRemaining days left until expiration)",0,"Done",0x0)        
+        & .\popup.ps1 -DaysRemaining $daysRemaining  #remove after testing
 
     }
 } else {
@@ -40,4 +41,4 @@ if ($null -ne $UserDetails.LastPasswordChangeDateTime) {
 }
 Write-Output "`n`n================================================================================================`n`n"
 
-Disconnect-MgGraph
+$null = Disconnect-MgGraph 

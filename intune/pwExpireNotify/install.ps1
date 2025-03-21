@@ -1,6 +1,11 @@
-$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$destinationPath = "C:\pwExpireNotify"  #Point to a location users do not have permissions to access
+$AccessTokenName= "GRAPH_PW_EXPIRE_TOKEN"
+$AccessTokenString= ""
 
+[System.Environment]::SetEnvironmentVariable($AccessTokenName, $AccessTokenString, [System.EnvironmentVariableTarget]::Machine)
+
+
+$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$destinationPath = ""  #set the desintation path here
 
 $logFile = Join-Path $destinationPath "installLog.txt"
 if (-not (Test-Path $destinationPath)) {
@@ -23,16 +28,33 @@ foreach ($module in $modules) {
     }
 }
 
-$sourceFile = Join-Path $scriptPath "notify.ps1"
-$destinationFile = Join-Path $destinationPath "callNotify.ps1"
-Copy-Item -Path $sourceFile -Destination $destinationFile -Force
-Add-Content -Path $logFile -Value "Copied notify.ps1 to callNotify.ps1."
+# copy checkExpire 
+$sourceFile = Join-Path $scriptPath "checkExpire.ps1"
+$destinationFile = Join-Path $destinationPath "checkExpire.ps1"
 
+Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+Add-Content -Path $logFile -Value "Copied checkExpire.ps1 "
+
+
+# copy popup.ps1
+$sourcePopupFile = Join-Path $scriptPath "popup.ps1"
+$destinationPopupFile = Join-Path $destinationPath "popup.ps1"
+Copy-Item -Path $sourcePopupFile -Destination $destinationPopupFile -Force
+Add-Content -Path $logFile -Value "Copied popup.ps1 "
+
+# task schedule checkExpire
 $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -WindowStyle Hidden -File `"$destinationFile`""
 $triggerLogon = New-ScheduledTaskTrigger -AtLogOn
 $triggerBoot = New-ScheduledTaskTrigger -AtStartup
-
 $triggers = @($triggerLogon, $triggerBoot)
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
+
+try {
+    Register-ScheduledTask -Action $action -Principal $principal -Trigger $triggers -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup." -RunLevel Highest
+    Add-Content -Path $logFile -Value "Scheduled task registered successfully with SYSTEM privileges."
+} catch {
+    Add-Content -Path $logFile -Value "Failed to register scheduled task with SYSTEM privileges: $_"
+}
 
 try {
     Register-ScheduledTask -Action $action -Trigger $triggers -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup."

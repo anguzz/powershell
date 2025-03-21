@@ -1,66 +1,38 @@
-# Disclaimer
-This project has been discontinued due to deployment challenges. The `Connect-MgGraph` module currently requires interactive authentication, which makes it unsuitable for silent installations or for fetching password expiration data without user interaction. The alternative is configure an Entra app with limited read access to manage authentication more securely through an access token in the script however, deploying this solution to client devices via intune security risks and is not advised. If you do follow this approach ensure that the `$destinationPath` in `install.ps1` is pointed at a directory users cannot access to minimize risk.
-
-
-
 # Overview
-This PowerShell package enhances security for organizations using Microsoft 365 by checking the password expiration status of the current user and alerting them with a popup message. It automatically attaches the domain's standard email to the user's UPN to make a Graph API call and check the last password change date against the organization's password policy.  
-
-![image](https://github.com/user-attachments/assets/306360fb-6e4a-42b7-afb3-44854191115b)
-
+This Intune package proactively informs users when their passwords are nearing expiration by leveraging Microsoft Graph API calls. By fetching the last password change date for the signed-in user and comparing it with your organization’s password policy, this tool ensures that users are aware of the impending need to update their passwords. The process is automated to operate seamlessly in the background, minimizing disruptions while enhancing security compliance across managed devices. The package is specifically designed to be deployed via Intune, ensuring a straightforward integration into existing enterprise management workflows.
 
 # Features
 - Automatically fetches the currently signed-in user's UPN.
-- Makes a Graph API call to retrieve the last password change date.
-- Compares this date with your organization's password policy to determine if the password is nearing expiration.
+- Uses Graph API to retrieve the last password change date.
+- Compares this date against your organization's password policy to determine if the password is nearing expiration.
+- Checks if the currently logged-in user account is enabled or disabled, with logic to handle disabled accounts in notifications.
+- Stores the API token in system environment variables `GRAPH_PW_EXPIRE_TOKEN`, enhancing security by restricting token access. 
 
 # Usage
-- Replace `$userPrincipalName = "$currentUser@email.com"` and `$emailExtension` with your domain's standard naming convention. 
-- Set your organization's password expiration interval in the script, e.g., `$PasswordPolicyInterval = 90`
-- Add an access token in `notify.ps1` at
-```powershell
-$accessToken = ""
-Connect-MgGraph -AccessToken ($accessToken |ConvertTo-SecureString -AsPlainText -Force) 
-```
+- Set your `$userPrincipalName` variable by changing the `$domainEmailExtension`  in the `checkExpire.ps1` script
+- Set your organization's password expiration interval in the script,  `$PasswordPolicyInterval = 90` in the `checkExpire.ps1` script
+- Add an `$AccessTokenString`  with the appropiate read permissions in the in `install.ps1` script
+- Set the `$destinationPath` variable used in all 3 scripts `detection.ps1` `install.ps1` and `uninstall.ps1` files where the expirationCheck task script will be saved. 
 
 # Authentication
-This script requires device authentication and should be executed with permissions adequate for reading user profiles. It is intended for deployment on managed devices but can be adapted for other setups by configuring a Graph app with the necessary permissions.
-
+This script utilizes system-level environment variables to securely store the API token where users cannot access , protecting it from unauthorized access and simplifying its rotation. Ensure your users do not have access to system level variables. It requires device authentication and should be executed with permissions adequate for reading user profiles. It is intended for deployment on managed devices but can be adapted for other setups by configuring a Graph app with the necessary permissions. Ensure your access token only has limited read access to increase security. 
 
 # Deployment 
-Deploy via Intune as an application. The `notify.ps1` script is copied to the target device as `callNotify.ps1` and placed in `C:\pwExpireNotify`. It is executed as a scheduled task set up through the `install.ps1` script. Installation success is confirmed by the creation of a log file at `C:\pwExpireNotify\installLog.txt` which can be checked to verify correct installation in `detection.ps1`
+- Deploy via Intune as an application. Call the `install.ps1` file after setting the appropiate variables. 
+- The `checkExpire.ps1` script is copied to the target device as `checkExpire.ps1` and placed in a secure folder after you set a destination path. 
+-  It is executed as a scheduled task set up through the `install.ps1` script with system-level access to ensure it can access the secured API token.
+- Installation success is confirmed by the creation of a log file at `C:\$desintationPath$\installLog.txt` which can be checked to verify correct installation in `detection.ps1`.
 
-- `C:\pwExpireNotify` can also be used as a detection target to see if the app installed properly. 
-- Only installs the Microsoft.Graph.Authentication and Microsoft.Graph.Users modules for device authentication on target device to minimize module footprint for the current user.
-
-
-
-# Important
-Run under user context to ensure access to the $currentUser environment variable. Powershell modules are also installed under the current user context rather then system. 
-
+- Only installs the necessary Microsoft.Graph modules for device authentication on the target device to minimize module footprint.
 
 # Notifications 
-Notifications are sent using the `-ComObject Wscript.Shell` interface.
-
-Here is an example of usage below.
-
-```powershell
-$wshell = New-Object -ComObject Wscript.Shell
-
-$wshell.Popup("Operation Completed",0,"Done",0x1)
-```
-
-- More info can be found at 
-https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/x83z1d9f(v=vs.84)?redirectedfrom=MSDN
-
-
+Notifications are enhanced with the `System.Windows.Forms.LinkLabel` class in the `popup.ps1` file, supporting hyperlinks and customizable UI elements such as font sizes and popup dimensions.
 
 # Script Details
 
-- `install.ps1`: Handles the setup of the directory, file copying `notify.ps1`, and scheduled task registration.
-- `uninstall.ps1`: Removes the scheduled task, directory,modules and all its contents for a clean uninstallation.
-- `detection.ps1`: Checks for the installation success by verifying the presence of the directory and script file.
-- `notify.ps1`: Connects to Microsoft Graph, checks password expiration based on the set policy interval, and displays notifications accordingly.
+- `install.ps1`: Handles the setup of the directory, file copying, system variable creation and scheduled task registration. 
+- `uninstall.ps1`: Removes the scheduled task, directory, modules, and all its contents for a clean uninstallation.  
+- `detection.ps1`: Checks for installation success by verifying the presence of the directory and script file. 
+- `checkExpire.ps1`: Connects to Microsoft Graph, checks password expiration based on the set policy interval, and calls notifications accordingly. 
+- `popup.ps1`: Uses the `System.Windows.Forms.LinkLabel` module to call a popup informing the user to reset their password.
 
-# Next steps
-- Add update module check on scheduled task so authentication module stays up to date

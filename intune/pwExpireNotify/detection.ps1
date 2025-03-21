@@ -1,5 +1,5 @@
-$destinationPath = "C:\pwExpireNotify"
-$scriptFile = "callNotify.ps1"
+$destinationPath = "" #add the destination path where you run this script clientside
+$scriptFile = "checkExpire.ps1"
 
 if (Test-Path $destinationPath) {
     $fullPath = Join-Path -Path $destinationPath -ChildPath $scriptFile

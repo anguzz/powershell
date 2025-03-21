@@ -1,5 +1,5 @@
 $taskName = "CheckUserPasswordPolicy"
-$destinationPath = "C:\pwExpireNotify"
+$destinationPath = ""
 $logFile = Join-Path $destinationPath "uninstallLog.txt"
 
 
@@ -18,7 +18,7 @@ try {
 }
 
 $taskName = "CheckUserPasswordPolicy"
-$destinationPath = "C:\pwExpireNotify"
+$destinationPath = ""
 $logFile = Join-Path $destinationPath "uninstallLog.txt"
 $modules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 
