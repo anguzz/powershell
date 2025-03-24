@@ -33,8 +33,11 @@ Notifications are enhanced with the `System.Windows.Forms.LinkLabel` class in th
 - `install.ps1`: Handles the setup of the directory, file copying, system variable creation and scheduled task registration. 
 - `uninstall.ps1`: Removes the scheduled task, directory, modules, and all its contents for a clean uninstallation.  
 - `detection.ps1`: Checks for installation success by verifying the presence of the task being succesfully created, meaning the install went through  
+#### Files Folder
 - `checkExpire.ps1`: Connects to Microsoft Graph, checks password expiration based on the set policy interval, and calls notifications accordingly. 
 - `popup.ps1`: Uses the `System.Windows.Forms.LinkLabel` module to call a popup informing the user to reset their password.
+
+
 
 # Run commands
 - Installer `powershell -ex bypass -file install.ps1`

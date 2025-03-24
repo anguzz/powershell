@@ -3,9 +3,16 @@ $AccessTokenString= ""
 
 [System.Environment]::SetEnvironmentVariable($AccessTokenName, $AccessTokenString, [System.EnvironmentVariableTarget]::Machine)
 
+$getToken = [System.Environment]::GetEnvironmentVariable($AccessTokenName, [System.EnvironmentVariableTarget]::Machine) 
+
+if ($getToken -eq $AccessTokenString) {
+    Write-Host "Success: Environment variable '$AccessTokenName' is set correctly."
+} else {
+    Write-Host "Error: Environment variable '$AccessTokenName' did not set correctly. Expected '$AccessTokenString' but got '$getToken'."
+}
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$destinationPath = ""  #set the desintation path here
+$destinationPath = "C:\Program Files\pwExpireNotifyClient" 
 
 $logFile = Join-Path $destinationPath "installLog.txt"
 if (-not (Test-Path $destinationPath)) {
@@ -28,38 +35,35 @@ foreach ($module in $modules) {
     }
 }
 
-# copy checkExpire 
-$sourceFile = Join-Path $scriptPath "checkExpire.ps1"
+
+$sourceFile = Join-Path $scriptPath "files\checkExpire.ps1"
 $destinationFile = Join-Path $destinationPath "checkExpire.ps1"
 
+
 Copy-Item -Path $sourceFile -Destination $destinationFile -Force
-Add-Content -Path $logFile -Value "Copied checkExpire.ps1 "
+Add-Content -Path $logFile -Value "Copied checkExpire.ps1 from files folder."
 
 
-# copy popup.ps1
-$sourcePopupFile = Join-Path $scriptPath "popup.ps1"
+$sourcePopupFile = Join-Path $scriptPath "files\popup.ps1"
 $destinationPopupFile = Join-Path $destinationPath "popup.ps1"
 Copy-Item -Path $sourcePopupFile -Destination $destinationPopupFile -Force
-Add-Content -Path $logFile -Value "Copied popup.ps1 "
+Add-Content -Path $logFile -Value "Copied popup.ps1 from files folder."
 
-# task schedule checkExpire
-$action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -WindowStyle Hidden -File `"$destinationFile`""
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -WindowStyle Hidden -File `"$destinationFile`""
+
 $triggerLogon = New-ScheduledTaskTrigger -AtLogOn
 $triggerBoot = New-ScheduledTaskTrigger -AtStartup
-$triggers = @($triggerLogon, $triggerBoot)
-$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
+
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
 try {
-    Register-ScheduledTask -Action $action -Principal $principal -Trigger $triggers -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup." -RunLevel Highest
+    Unregister-ScheduledTask -TaskName "CheckUserPasswordPolicy" -Confirm:$false -ErrorAction SilentlyContinue
+
+    # Register the new task
+    Register-ScheduledTask -Action $action -Principal $principal -Trigger @($triggerLogon, $triggerBoot) -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup."
     Add-Content -Path $logFile -Value "Scheduled task registered successfully with SYSTEM privileges."
 } catch {
     Add-Content -Path $logFile -Value "Failed to register scheduled task with SYSTEM privileges: $_"
-}
-
-try {
-    Register-ScheduledTask -Action $action -Trigger $triggers -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup."
-    Add-Content -Path $logFile -Value "Scheduled task registered successfully."
-} catch {
-    Add-Content -Path $logFile -Value "Failed to register scheduled task: $_"
+    # Consider logging the exception details to better understand the error
     Write-Error $_
 }
