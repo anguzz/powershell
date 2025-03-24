@@ -1,17 +1,14 @@
-$destinationPath = "" #add the destination path where you run this script clientside
-$scriptFile = "checkExpire.ps1"
+$taskName = "CheckUserPasswordPolicy"
 
-if (Test-Path $destinationPath) {
-    $fullPath = Join-Path -Path $destinationPath -ChildPath $scriptFile
-    
-    if (Test-Path $fullPath) {
-        Write-Output "Installation detected successfully."
-        Exit 0  # Success code
+try {
+     Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
+    Write-Output "Scheduled task '$taskName' detected successfully."
+    Exit 0  # Success code
+} catch {
+    if ($_.Exception -match "does not exist") {
+        Write-Output "Scheduled task '$taskName' not found."
     } else {
-        Write-Output "Script file missing."
-        Exit 1  
+        Write-Output "Error checking scheduled task: $($_.Exception.Message)"
     }
-} else {
-    Write-Output "Destination directory missing."
-    Exit 1  
+    Exit 1  # Error code
 }

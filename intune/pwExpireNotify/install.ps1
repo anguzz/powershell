@@ -61,4 +61,5 @@ try {
     Add-Content -Path $logFile -Value "Scheduled task registered successfully."
 } catch {
     Add-Content -Path $logFile -Value "Failed to register scheduled task: $_"
+    Write-Error $_
 }
