@@ -1,5 +1,5 @@
 $AccessTokenName = "GRAPH_PW_EXPIRE_TOKEN"
-$destinationPath = "C:\Program Files\pwExpireNotifyClient" 
+$destinationPath = "" 
 $logFilePath = "C:\logs"
 $logFile = Join-Path $logFilePath "uninstall_pw_notify_expire_Log.txt"
 

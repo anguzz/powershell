@@ -6,7 +6,7 @@ $AccessTokenString = [System.Environment]::GetEnvironmentVariable($AccessTokenNa
 Connect-MgGraph -AccessToken ($AccessTokenString |ConvertTo-SecureString -AsPlainText -Force) -NoWelcome -ErrorAction stop 
 
 
-$domainEmailExtension="@fbmsales.com"
+$domainEmailExtension="@email.com"
 $currentUser = $currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
 
 #same as doing this $env:USERNAME but since we are runnning via system on intune we will get system or null return hence call who is running explorer graphical process.
