@@ -5,13 +5,19 @@ $AccessTokenString = [System.Environment]::GetEnvironmentVariable($AccessTokenNa
 
 Connect-MgGraph -AccessToken ($AccessTokenString |ConvertTo-SecureString -AsPlainText -Force) -NoWelcome -ErrorAction stop 
 
-$domainEmailExtension="@mydomain.com"
+
+$domainEmailExtension="@fbmsales.com"
 $currentUser = $currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
-#$currentUser = $env:USERNAME 
-#similiar to this but system cannot see current user if ran via intune as system
+
+#same as doing this $env:USERNAME but since we are runnning via system on intune we will get system or null return hence call who is running explorer graphical process.
 
 $PasswordPolicyInterval = 90
+
 $userPrincipalName = "$currentUser$domainEmailExtension"
+
+$scriptPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition #this is to call the popup script 
+$popupScriptPath = Join-Path -Path $scriptPath -ChildPath "popup.ps1"
+
 
 
 Write-Output "`n`n================================================================================================`n`n"
@@ -29,14 +35,14 @@ if ($null -ne $UserDetails.LastPasswordChangeDateTime) {
 
     if ($daysRemaining -le 0)  {
         Write-Output "The password has expired or today is the expiration day." #this condition will only occur day of, otherwise user is locked out. 
-        & .\popup.ps1 -DaysRemaining $daysRemaining #calls my popup script and passes in the days remaining from our api call
+        & $popupScriptPath -DaysRemaining $daysRemaining #calls my popup script and passes in the days remaining from our api call
 
     } elseif ($daysRemaining -le 10) {
         Write-Output "The password will expire in $daysRemaining days. Consider changing it soon."
-        & .\popup.ps1 -DaysRemaining $daysRemaining #calls my popup script and passes in the days remaining from our api call
+        & $popupScriptPath -DaysRemaining $daysRemaining #calls my popup script and passes in the days remaining from our api call
     } else {
         Write-Output "Password is within policy limits. ($daysRemaining days left until expiration)"
-        & .\popup.ps1 -DaysRemaining $daysRemaining  #remove after testing
+        & $popupScriptPath -DaysRemaining $daysRemaining  #remove after testing
 
     }
 } else {
