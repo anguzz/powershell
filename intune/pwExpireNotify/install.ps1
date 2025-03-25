@@ -1,8 +1,11 @@
-$AccessTokenName= "GRAPH_PW_EXPIRE_TOKEN"
-$AccessTokenString= ""
-[System.Environment]::SetEnvironmentVariable($AccessTokenName, $AccessTokenString, [System.EnvironmentVariableTarget]::Machine)
 
-$getToken = [System.Environment]::GetEnvironmentVariable($AccessTokenName, [System.EnvironmentVariableTarget]::Machine) 
+
+$PW_Expire_key_name= "GRAPH_PW_EXPIRE_KEY"
+$PW_Expire_key_string = "test_key"
+
+[System.Environment]::SetEnvironmentVariable($PW_Expire_key_name, $PW_Expire_key_string, [System.EnvironmentVariableTarget]::Machine)
+
+$checkToken = [System.Environment]::GetEnvironmentVariable($PW_Expire_key_name, [System.EnvironmentVariableTarget]::Machine) 
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $destinationPath = "" 
@@ -13,12 +16,12 @@ if (-not (Test-Path $destinationPath)) {
     Add-Content -Path $logFile -Value "Created destination directory at $destinationPath."
 }
 
-if ($getToken -eq $AccessTokenString) {
-    Write-Host "Success: Environment variable '$AccessTokenName' is set correctly."
+if ($checkToken -eq $PW_Expire_key_string) {
+    Write-Host "Success: Environment variable '$PW_Expire_key_name' is set correctly."
     Add-Content -Path $logFile -Value "Verified that environment variable is set correctly."
 } else {
-    Write-Host "Error: Environment variable '$AccessTokenName' did not set correctly. Expected '$AccessTokenString' but got '$getToken'."
-    Add-Content -Path $logFile -Value "Failed to verify environment variable: expected '$AccessTokenString' but got '$getToken'."
+    Write-Host "Error: Environment variable '$PW_Expire_key_name' did not set correctly. Expected '$PW_Expire_key_string' but got '$checkToken'."
+    Add-Content -Path $logFile -Value "Failed to verify environment variable: expected '$PW_Expire_key_string' but got '$checkToken'."
 }
 
 

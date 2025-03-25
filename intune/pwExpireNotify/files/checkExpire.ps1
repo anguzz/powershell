@@ -1,9 +1,14 @@
 # Start-Sleep -Seconds 120 #to allow device to connect to network properly, etc
 
-$AccessTokenName= "GRAPH_PW_EXPIRE_TOKEN" #set in the install script
-$AccessTokenString = [System.Environment]::GetEnvironmentVariable($AccessTokenName, [System.EnvironmentVariableTarget]::Machine)
+$tenantID="" # does not change and static so we can leave here
 
-Connect-MgGraph -AccessToken ($AccessTokenString |ConvertTo-SecureString -AsPlainText -Force) -NoWelcome -ErrorAction stop 
+$PW_Expire_key_name= "GRAPH_PW_EXPIRE_KEY" #set in the install script
+$PW_Expire_key_string = [System.Environment]::GetEnvironmentVariable($PW_Expire_key_name, [System.EnvironmentVariableTarget]::Machine)
+
+Connect-MgGraph -TenantId $tenantID -ClientSecretCredential $PW_Expire_key_string
+
+#Connect-MgGraph -AccessToken ($AccessTokenString |ConvertTo-SecureString -AsPlainText -Force) -NoWelcome -ErrorAction stop
+# alternatively if you want to test with access token that graph generates, but these timeout and rotate making them difficult to manage in an actual enviroment. 
 
 
 $domainEmailExtension="@email.com"
