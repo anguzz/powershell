@@ -11,8 +11,7 @@ $form.Text = "IT Department"
 $linkLabel = New-Object System.Windows.Forms.LinkLabel
 $linkLabel.AutoSize = $true  
 $linkLabel.Font = New-Object System.Drawing.Font("Arial", 12)
-
-$currentUser = $env:USERNAME
+$currentUser = $currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
 
 $text = "Hi $currentUser, Your password will expire in $DaysRemaining days.`n`n Please update your password soon from any browser at https://myaccount.microsoft.com"
 
