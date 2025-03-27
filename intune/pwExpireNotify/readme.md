@@ -8,6 +8,11 @@ This Intune package proactively informs users when their passwords are nearing e
 - Checks if the currently logged-in user account is enabled or disabled, with logic to handle disabled accounts in notifications.
 - Encrypts and stores the API client secret in system environment variables `encrypted_client_secret` for authentication
 - Ensures the scheduled task creation will execute until it has network to make the api call
+  
+![image](https://github.com/user-attachments/assets/c0b58dce-b996-4fb1-be25-00275ddb8e4d)
+
+
+![image](https://github.com/user-attachments/assets/918019eb-0907-441f-b41c-546fc752496d)
 
 
 # Usage
