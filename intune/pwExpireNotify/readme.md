@@ -6,16 +6,19 @@ This Intune package proactively informs users when their passwords are nearing e
 - Uses Graph API to retrieve the last password change date.
 - Compares this date against your organization's password policy to determine if the password is nearing expiration.
 - Checks if the currently logged-in user account is enabled or disabled, with logic to handle disabled accounts in notifications.
-- Stores the API client secret in system environment variables `GRAPH_PW_EXPIRE_KEY` 
+- Encrypts and stores the API client secret in system environment variables `encrypted_client_secret` for authentication
+- Ensures the scheduled task creation will execute until it has network to make the api call
+
 
 # Usage
 - Set your `$userPrincipalName` variable by changing the `$domainEmailExtension`  in the `checkExpire.ps1` script
-- Set your organization's password expiration interval in the script,  `$PasswordPolicyInterval = 90` in the `checkExpire.ps1` script
-- Add a `$PW_Expire_key_string` and with the appropiate read permissions in the in `install.ps1` script
+- Set your organization's password expiration interval `$PasswordPolicyInterval` in the `checkExpire.ps1` script
 - Set the `$destinationPath` variable used in all 3 scripts `detection.ps1` `install.ps1` and `uninstall.ps1` files where the expirationCheck task script will be saved. 
+- Set the `$tenantID`, `$clientID` & `$client_secret` in the install.ps1 file
+- Add your `logo.png` under files and modify the popup dimensions for it accordingly.
 
 # Authentication
-This script utilizes system-level environment variables to store the client secret where users cannot edit it, protecting it from unauthorized access and simplifying its rotation. Ensure your users do not have access to system level variables. It requires device authentication and should be executed with permissions adequate for reading user profiles. It is intended for deployment on managed devices but can be adapted for other setups by configuring a Graph app with the necessary permissions. Ensure your client secret has limited read access to increase security. 
+This script utilizes connects to graph `Connect-MgGraph -TenantId $tenantID -ClientSecretCredential $credential` Ensure you setup an entra app with appropiate limited read access. The system-level environment variables to store the client secret where users cannot edit it, protecting it from unauthorized modification. Ensure your users do not have access to edit system level variables. The client secret is encrypted when stored as a system enviroment variable and decrypted during runtime. 
 
 # Deployment 
 - Deploy via Intune as an application. Call the `install.ps1` file after setting the appropiate variables. 
@@ -36,9 +39,10 @@ Notifications are enhanced with the `System.Windows.Forms.LinkLabel` class in th
 #### Files Folder
 - `checkExpire.ps1`: Connects to Microsoft Graph, checks password expiration based on the set policy interval, and calls notifications accordingly. 
 - `popup.ps1`: Uses the `System.Windows.Forms.LinkLabel` module to call a popup informing the user to reset their password.
-
+- `popup2.ps1`: Seperate popup that gets called when the users account is locked or not enabled. `https://graph.microsoft.com/v1.0/me?$select=accountEnabled`
 
 
 # Run commands
-- Installer `powershell -ex bypass -file install.ps1`
+- Installer `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
 - Uninstaller `powershell -ex bypass -file uninstall.ps1`
+- Ensure system install with 64 bit powershell installation. 

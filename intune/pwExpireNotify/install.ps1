@@ -1,29 +1,23 @@
 
 
-$PW_Expire_key_name= "GRAPH_PW_EXPIRE_KEY"
-$PW_Expire_key_string = "test_key"
-
-[System.Environment]::SetEnvironmentVariable($PW_Expire_key_name, $PW_Expire_key_string, [System.EnvironmentVariableTarget]::Machine)
-
-$checkToken = [System.Environment]::GetEnvironmentVariable($PW_Expire_key_name, [System.EnvironmentVariableTarget]::Machine) 
-
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$destinationPath = "" 
+$destinationPath = "C:\" 
 $logFile = Join-Path $destinationPath "installLog.txt"
+
+
+$client_secret_name="Intune_Desktop_Notifications"
+$client_secret= ""
+
+$secureString = ConvertTo-SecureString $client_secret -AsPlainText -Force
+$encrypted_client_secret = ConvertFrom-SecureString $secureString
+
+[Environment]::SetEnvironmentVariable($client_secret_name, $encrypted_client_secret, [EnvironmentVariableTarget]::Machine)
+
 
 if (-not (Test-Path $destinationPath)) {
     New-Item -Path $destinationPath -ItemType Directory | Out-Null
     Add-Content -Path $logFile -Value "Created destination directory at $destinationPath."
 }
-
-if ($checkToken -eq $PW_Expire_key_string) {
-    Write-Host "Success: Environment variable '$PW_Expire_key_name' is set correctly."
-    Add-Content -Path $logFile -Value "Verified that environment variable is set correctly."
-} else {
-    Write-Host "Error: Environment variable '$PW_Expire_key_name' did not set correctly. Expected '$PW_Expire_key_string' but got '$checkToken'."
-    Add-Content -Path $logFile -Value "Failed to verify environment variable: expected '$PW_Expire_key_string' but got '$checkToken'."
-}
-
 
 $modules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 foreach ($module in $modules) {
@@ -51,15 +45,29 @@ $destinationPopupFile = Join-Path $destinationPath "popup.ps1"
 Copy-Item -Path $sourcePopupFile -Destination $destinationPopupFile -Force
 Add-Content -Path $logFile -Value "Copied popup.ps1 from $sourcePopupFile to $destinationPopupFile."
 
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -WindowStyle Hidden -File `"$destinationFile`""
+$sourcePopupFile2 = Join-Path $scriptPath "files\popup2.ps1"
+$destinationPopupFile2 = Join-Path $destinationPath "popup2.ps1"
+Copy-Item -Path $sourcePopupFile2 -Destination $destinationPopupFile2 -Force
+Add-Content -Path $logFile -Value "Copied popup2.ps1 from $sourcePopupFile2 to $destinationPopupFile2."
+
+$logoFile = Join-Path $scriptPath "files\Logo.png"
+$destinationlogoFile = Join-Path $destinationPath "Logo.png"
+Copy-Item -Path $logoFile -Destination $destinationPath -Force
+Add-Content -Path $logFile -Value "Copied Logo.png from $sourcePopupFile2 to $destinationlogoFile."
+
+
+$action = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$destinationFile`""
+
+
 $triggerLogon = New-ScheduledTaskTrigger -AtLogOn
 $triggerBoot = New-ScheduledTaskTrigger -AtStartup
-$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserId (([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name) -LogonType Interactive -RunLevel Highest
+$networkSettings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 
 try {
     Unregister-ScheduledTask -TaskName "CheckUserPasswordPolicy" -Confirm:$false -ErrorAction SilentlyContinue
-    Register-ScheduledTask -Action $action -Principal $principal -Trigger @($triggerLogon, $triggerBoot) -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup."
-    Add-Content -Path $logFile -Value "Scheduled task 'CheckUserPasswordPolicy' registered successfully with SYSTEM privileges."
+    Register-ScheduledTask -Action $action -Principal $principal -Trigger @($triggerLogon, $triggerBoot) -TaskName "CheckUserPasswordPolicy" -Description "Check password policy compliance on logon and system startup." -Settings $networkSettings  
+    Add-Content -Path $logFile -Value "Scheduled task 'CheckUserPasswordPolicy' registered successfully with appropriate privileges and conditions."
 } catch {
     Add-Content -Path $logFile -Value "Failed to register scheduled task: $_"
     Write-Error $_
