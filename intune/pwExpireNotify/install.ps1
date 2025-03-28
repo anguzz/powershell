@@ -1,23 +1,24 @@
 
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$destinationPath = "C:\" 
+$destinationPath = "C:\pwExNotify" 
 $logFile = Join-Path $destinationPath "installLog.txt"
-
-
-$client_secret_name="Intune_Desktop_Notifications"
-$client_secret= ""
-
-$secureString = ConvertTo-SecureString $client_secret -AsPlainText -Force
-$encrypted_client_secret = ConvertFrom-SecureString $secureString
-
-[Environment]::SetEnvironmentVariable($client_secret_name, $encrypted_client_secret, [EnvironmentVariableTarget]::Machine)
-
 
 if (-not (Test-Path $destinationPath)) {
     New-Item -Path $destinationPath -ItemType Directory | Out-Null
     Add-Content -Path $logFile -Value "Created destination directory at $destinationPath."
 }
+
+$client_secret_name="Intune_Desktop_Notifications"
+$client_secret= "" #add here
+$AESKey = [Convert]::FromBase64String("") #add generated key here
+
+$secureString = ConvertTo-SecureString $client_secret -AsPlainText -Force
+$encrypted_client_secret = ConvertFrom-SecureString -SecureString $secureString -Key $AESKey
+
+[Environment]::SetEnvironmentVariable($client_secret_name, $encrypted_client_secret, [EnvironmentVariableTarget]::Machine)
+
+
 
 $modules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 foreach ($module in $modules) {
@@ -52,17 +53,25 @@ Add-Content -Path $logFile -Value "Copied popup2.ps1 from $sourcePopupFile2 to $
 
 $logoFile = Join-Path $scriptPath "files\Logo.png"
 $destinationlogoFile = Join-Path $destinationPath "Logo.png"
-Copy-Item -Path $logoFile -Destination $destinationPath -Force
+Copy-Item -Path $logoFile -Destination $destinationlogoFile -Force
 Add-Content -Path $logFile -Value "Copied Logo.png from $sourcePopupFile2 to $destinationlogoFile."
 
 
-$action = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$destinationFile`""
+$action = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$destinationFile`"" 
 
 
 $triggerLogon = New-ScheduledTaskTrigger -AtLogOn
 $triggerBoot = New-ScheduledTaskTrigger -AtStartup
-$principal = New-ScheduledTaskPrincipal -UserId (([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name) -LogonType Interactive -RunLevel Highest
+
+$currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
+$domain="HABS\"
+$accountName=$domain+$currentUser 
+$userSID = (New-Object System.Security.Principal.NTAccount($accountName)).Translate([System.Security.Principal.SecurityIdentifier]) #maps accountname 
+$principal = New-ScheduledTaskPrincipal -UserId $accountName -LogonType Interactive
 $networkSettings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+
+
+Add-Content -Path $logFile -Value "$currentUserName" 
 
 try {
     Unregister-ScheduledTask -TaskName "CheckUserPasswordPolicy" -Confirm:$false -ErrorAction SilentlyContinue

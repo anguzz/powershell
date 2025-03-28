@@ -6,7 +6,8 @@ This Intune package proactively informs users when their passwords are nearing e
 - Uses Graph API to retrieve the last password change date.
 - Compares this date against your organization's password policy to determine if the password is nearing expiration.
 - Checks if the currently logged-in user account is enabled or disabled, with logic to handle disabled accounts in notifications.
-- Encrypts and stores the API client secret in system environment variables `encrypted_client_secret` for authentication
+- Encrypts and stores the API client secret in system environment variables `Intune_Desktop_Notifications` for authentication
+- Decrypts the key in the checkExpire script during runtime. 
 - Ensures the scheduled task creation will execute until it has network to make the api call
   
 ![image](https://github.com/user-attachments/assets/c0b58dce-b996-4fb1-be25-00275ddb8e4d)
@@ -17,9 +18,10 @@ This Intune package proactively informs users when their passwords are nearing e
 
 # Usage
 - Set your `$userPrincipalName` variable by changing the `$domainEmailExtension`  in the `checkExpire.ps1` script
-- Set your organization's password expiration interval `$PasswordPolicyInterval` in the `checkExpire.ps1` script
-- Set the `$destinationPath` variable used in all 3 scripts `detection.ps1` `install.ps1` and `uninstall.ps1` files where the expirationCheck task script will be saved. 
+- Set your organization's password expiration interval `$PasswordPolicyInterval` in the `checkExpire.ps1` script. Currently it's set as a default of 90 days. 
+- Adjust the `$destinationPath` variable used in all 3 scripts `detection.ps1` `install.ps1` and `uninstall.ps1`. Currently it's set as at a default location in the C drive at `C:\pwExNotify`  
 - Set the `$tenantID`, `$clientID` & `$client_secret` in the install.ps1 file
+- Run the `generateKey.ps1` file to generate an AES key, add the key in both `install.ps1` and `checkExpire.ps1`. This key is necessary for the `ConvertTo-Secure` string to read across System vs User contexts.  
 - Add your `logo.png` under files and modify the popup dimensions for it accordingly.
 
 # Authentication
@@ -45,6 +47,7 @@ Notifications are enhanced with the `System.Windows.Forms.LinkLabel` class in th
 - `checkExpire.ps1`: Connects to Microsoft Graph, checks password expiration based on the set policy interval, and calls notifications accordingly. 
 - `popup.ps1`: Uses the `System.Windows.Forms.LinkLabel` module to call a popup informing the user to reset their password.
 - `popup2.ps1`: Seperate popup that gets called when the users account is locked or not enabled. `https://graph.microsoft.com/v1.0/me?$select=accountEnabled`
+- `generateKey.ps1` Generates an AES key used for encryption/decryption in different contexts. 
 
 
 # Run commands

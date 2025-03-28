@@ -4,19 +4,22 @@
 $tenantID = "" 
 $clientID = "" 
 $client_secret_name = "Intune_Desktop_Notifications"
+$AESKey = [Convert]::FromBase64String("") #add generated key here. 
+
 $encrypted_client_secret = [Environment]::GetEnvironmentVariable($client_secret_name, [EnvironmentVariableTarget]::Machine)
 
-$secureString = ConvertTo-SecureString $encrypted_client_secret
+$secureString = ConvertTo-SecureString $encrypted_client_secret -Key $AESKey
 $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureString)
 $decrypted_client_secret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 $secureClientSecret = ConvertTo-SecureString $decrypted_client_secret -AsPlainText -Force
+
 $credential = New-Object System.Management.Automation.PSCredential ($clientID, $secureClientSecret)
+Connect-MgGraph -TenantId $tenantID -ClientSecretCredential $credential
 
-Connect-MgGraph -TenantId $tenantID -ClientSecretCredential $credential 
+$domainEmailExtension="@gmail.com"
+$currentUser = $env:USERNAME #ok do this here since the task gets set as a user level task meaning it has visibility over username
 
-$domainEmailExtension="@email.com"
-$currentUser = $currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
-#same as doing this $env:USERNAME but since we are runnning via system on intune we will get system or null return hence call who is running explorer graphical process.
+
 $PasswordPolicyInterval = 90
 
 $userPrincipalName = "$currentUser$domainEmailExtension"
@@ -41,13 +44,13 @@ if ($null -ne $UserDetails.LastPasswordChangeDateTime) {
 
     if (-not $accountEnabled) {
         Write-Output "The account is disabled."
-         & $lockedAccountPopUpScriptPath -DaysRemaining $daysRemaining  
+        # & $lockedAccountPopUpScriptPath -DaysRemaining $daysRemaining  
     } elseif ($daysRemaining -le 14) {
         Write-Output "The password will expire in $daysRemaining days. Consider changing it soon."
         & $popupScriptPath -DaysRemaining $daysRemaining
     } else {
         Write-Output "Password is within policy limits. ($daysRemaining days left until expiration)"
-        #& $popupScriptPath -DaysRemaining $daysRemaining  #uncomment if you want to test
+        # & $popupScriptPath -DaysRemaining $daysRemaining  #uncomment if you want popups everyday
     }
 } else {
     Write-Output "No Last Password Change Date available or user details missing."

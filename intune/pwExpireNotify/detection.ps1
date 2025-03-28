@@ -1,14 +1,17 @@
-$taskName = "CheckUserPasswordPolicy"
-
-try {
-     Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
-    Write-Output "Scheduled task '$taskName' detected successfully."
-    Exit 0  # ok
-} catch {
-    if ($_.Exception -match "does not exist") {
-        Write-Output "Scheduled task '$taskName' not found."
-    } else {
-        Write-Output "Error checking scheduled task: $($_.Exception.Message)"
-    }
-    Exit 1  # err
-}
+$destinationPath = "C:\pwExNotify"
+ $scriptFile = "checkExpire.ps1"
+ 
+ if (Test-Path $destinationPath) {
+     $fullPath = Join-Path -Path $destinationPath -ChildPath $scriptFile
+     
+     if (Test-Path $fullPath) {
+         Write-Output "Installation detected successfully."
+         Exit 0  # Success code
+     } else {
+         Write-Output "Script file missing."
+         Exit 1  
+     }
+ } else {
+     Write-Output "Destination directory missing."
+     Exit 1  
+ }

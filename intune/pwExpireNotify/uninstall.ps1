@@ -1,6 +1,7 @@
-$destinationPath = "C:\" 
+$destinationPath = "C:\pwExNotify" 
 $logFilePath = "C:\logs"
 $logFile = Join-Path $logFilePath "uninstall_pw_notify_expire_Log.txt"
+$client_secret_name="Intune_Desktop_Notifications"
 
 # check for the log directory 
 if (-Not (Test-Path -Path $logFilePath)) {
@@ -30,8 +31,16 @@ try {
     Add-Content -Path $logFile -Value "Failed to delete folder: $_"
 }
 
+# remove the env variable  
+try {
+    [Environment]::SetEnvironmentVariable($client_secret_name, $null, [EnvironmentVariableTarget]::Machine)
+    Add-Content -Path $logFile -Value "Environment variable '$client_secret_name' removed successfully."
+} catch {
+    Add-Content -Path $logFile -Value "Failed to remove environment variable: $_"
+}
 
-#remove graph modules
+# removes graph module
+<# 
 $modules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 foreach ($module in $modules) {
     try {
@@ -41,4 +50,4 @@ foreach ($module in $modules) {
         Add-Content -Path $logFile -Value "Failed to uninstall $module module: $_"
     }
 }
-
+#>
