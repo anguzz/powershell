@@ -18,7 +18,18 @@ $encrypted_client_secret = ConvertFrom-SecureString -SecureString $secureString 
 
 [Environment]::SetEnvironmentVariable($client_secret_name, $encrypted_client_secret, [EnvironmentVariableTarget]::Machine)
 
+$nugetProviderVersion = '2.8.5.201'
+$nugetProviderInstalled = Get-PackageProvider -ListAvailable | Where-Object { $_.Name -eq 'NuGet' -and [version]$_.Version -ge [version]$nugetProviderVersion }
 
+if (-not $nugetProviderInstalled) {
+    Write-Host "Installing NuGet $nugetProviderVersion provider..."
+    Add-Content -Path $logFile -Value "Installing NuGet $nugetProviderVersion provider..." 
+
+    Install-PackageProvider -Name NuGet -MinimumVersion $nugetProviderVersion -Force -Confirm:$false
+    Import-PackageProvider NuGet -Force
+}
+
+Add-Content -Path $logFile -Value "Installing graph module"
 
 $modules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 foreach ($module in $modules) {
@@ -64,7 +75,7 @@ $triggerLogon = New-ScheduledTaskTrigger -AtLogOn
 $triggerBoot = New-ScheduledTaskTrigger -AtStartup
 
 $currentUser = (Get-WmiObject Win32_Process -Filter "Name = 'explorer.exe'").GetOwner().User
-$domain="HABS\"
+$domain="DOMAIN\"
 $accountName=$domain+$currentUser 
 $userSID = (New-Object System.Security.Principal.NTAccount($accountName)).Translate([System.Security.Principal.SecurityIdentifier]) #maps accountname 
 $principal = New-ScheduledTaskPrincipal -UserId $accountName -LogonType Interactive
