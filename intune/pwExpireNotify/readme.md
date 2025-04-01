@@ -33,7 +33,7 @@ This script utilizes connects to graph `Connect-MgGraph -TenantId $tenantID -Cli
 -  It is executed as a scheduled task set up through the `install.ps1` script with system-level access to ensure it can access the graph application.
 - Installation success is confirmed by the creation of a log file at `C:\$desintationPath$\installLog.txt` which can be checked to verify correct installation in `detection.ps1`.
 
-- Only installs the necessary Microsoft.Graph modules for device authentication on the target device to minimize module footprint.
+- Only installs the necessary Microsoft.Graph modules for device authentication and updates NuGet to 2.8.5.201 for install compatibility on the target device to minimize module footprint.
 
 # Notifications 
 Notifications are enhanced with the `System.Windows.Forms.LinkLabel` class in the `popup.ps1` file, supporting hyperlinks and customizable UI elements such as font sizes and popup dimensions.
