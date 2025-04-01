@@ -12,3 +12,7 @@ This PowerShell script connects to Microsoft Graph API to fetch and report on ma
 
 # Usage
 - Add the Group object ID found in entra at `$groupId` to target the group you want
+
+
+# `getDevicesv2.ps1`
+- Will send an extra request against a `device.id` at https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($device.id) to get more information that is only returned at this endpoint. The user endpoint `https://graph.microsoft.com/v1.0/users/$userId/managedDevices` "will return null for certain device properties even if queried, so for the meantime I added this to call the deviceManagment endpoint. 
