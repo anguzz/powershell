@@ -1,6 +1,7 @@
 Connect-MgGraph -Scopes "User.ReadWrite.All", "DeviceManagementManagedDevices.ReadWrite.All", "Directory.ReadWrite.All"
 
-$groupId = ""
+$groupId = "" 
+
 $selectString = "userPrincipalName,id"
 $uri = "https://graph.microsoft.com/v1.0/groups/$groupId/members`?`$select=$selectString"
 
@@ -39,11 +40,19 @@ if ($null -eq $groupMembers.value -or $groupMembers.value.Count -eq 0) {
                     <# the reason for this section is that some of these response values are not included in the previous deviceURI endpoint, such as enrolledbyUserPrincipalName meaning we have to
                     query for those extra values against the device once we have the device id and add them #>
                     #######################################################################
-                    $deviceEnrollUri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($device.id)`?`$select=enrolledByUserPrincipalName"
-                    $enrollResponse = Invoke-MgGraphRequest -Uri $deviceEnrollUri -Method GET -OutputType PSObject
-                    $enrolledByUPN = "NA"
-                    if ($null -ne $enrollResponse) {
-                        $enrolledByUPN = $enrollResponse.enrolledByUserPrincipalName
+                    $managedDeviceUri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($device.id)`?`$select=enrolledByUserPrincipalName,hardwareInformation"
+                    $managedDeviceResponse = Invoke-MgGraphRequest -Uri $managedDeviceUri -Method GET -OutputType PSObject
+                    
+                    #the following info is for hardware information, it has to be converted to a string to be added to csv 
+                    $wiredIPv4Addresses= $managedDeviceResponse.hardwareInformation.wiredIPv4Addresses | Out-String
+                    $ipAddressV4= $managedDeviceResponse.hardwareInformation.ipAddressV4 | Out-String 
+
+                    $subnetAddress= $managedDeviceResponse.hardwareInformation.subnetAddress | Out-String
+
+
+                    $enrolledByUPN = $null
+                    if ($null -ne $managedDeviceResponse) {
+                        $enrolledByUPN = $managedDeviceResponse.enrolledByUserPrincipalName
                     }
                     #######################################################################    
                 
@@ -54,38 +63,39 @@ if ($null -eq $groupMembers.value -or $groupMembers.value.Count -eq 0) {
                         "Enrolled by User Principal name" = $enrolledByUPN
                         "Azure AD Device ID"                       = $device.azureADDeviceId
                         "OS version"                               = $device.osVersion
-                        "Azure AD registered"                      = $device.azureADRegistered
-                       # "EAS activation ID"                        = $device.easDeviceId
+                        "Azure AD registered"                      = $device.azureADRegistered    
                         "Serial number"                            = $device.serialNumber
                         "Manufacturer"                             = $device.manufacturer
                         "Model"                                    = $device.model
-                        "EAS activated"                            = $device.easActivated
-                       #"IMEI"                                     = $device.imei
-                       # "Last EAS sync time"                       = $device.easActivationDateTime
-                       # "EAS reason"                               = $device.exchangeAccessStateReason
-                        #"EAS status"                               = $device.exchangeAccessState
-                        #"Compliance grace period expiration"       = $device.complianceGracePeriodExpirationDateTime
-                        "Security patch level"                     = $device.androidSecurityPatchLevel
                         "Wi-Fi MAC"                                = $device.wiFiMacAddress
-                        #"MEID"                                     = $device.meid
-                        #"Subscriber carrier"                       = $device.subscriberCarrier
                         "Total storage"                            = $device.totalStorageSpaceInBytes
-                        "Free storage"                             = $device.freeStorageSpaceInBytes
-                       # "Management name"                          = $device.managedDeviceName
-                        "Category"                                 = $device.deviceCategoryDisplayName
-                        "UserId"                                   = $device.userId
-                       # "Primary user display name"                = $device.userDisplayName
+                        #"Free storage"                             = $device.freeStorageSpaceInBytes
                         "Compliance"                               = $device.complianceState
                         "Managed by"                               = $device.managementAgent
                         "Ownership"                                = $device.managedDeviceOwnerType
                         "Device state"                             = $device.deviceRegistrationState
                         "Intune registered"                        = $device.azureADRegistered
-                        #"Supervised"                               = $device.isSupervised
                         "Encrypted"                                = $device.isEncrypted
                         "OS"                                       = $device.operatingSystem
-                        "Management certificate expiration date"   = $device.managementCertificateExpirationDate
-                        #"Hardware info"                             =$device.hardwareInformation.wiredIPv4Addresses # will not work to get nested info, need to handle this later somehow
-
+                        "wiredIPv4Addresses"                       = $wiredIPv4Addresses
+                        "ipAddressV4"                              = $ipAddressV4
+                        "subnetAddress"                            = $subnetAddress
+                        #"Supervised"                               = $device.isSupervised
+                        #"IMEI"                                     = $device.imei
+                        # "Last EAS sync time"                      = $device.easActivationDateTime
+                        # "EAS reason"                              = $device.exchangeAccessStateReason
+                        #"EAS status"                               = $device.exchangeAccessState
+                        #"EAS activated"                            = $device.easActivated
+                        #"Security patch level"                     = $device.androidSecurityPatchLevel
+                        #"Compliance grace period expiration"       = $device.complianceGracePeriodExpirationDateTime
+                        # "Management certificate expiration date"  = $device.managementCertificateExpirationDate
+                        # "Management name"                         = $device.managedDeviceName
+                        #"Category"                                 = $device.deviceCategoryDisplayName
+                        # "UserId"                                  = $device.userId
+                        # "Primary user display name"               = $device.userDisplayName
+                        #"MEID"                                     = $device.meid
+                        #"Subscriber carrier"                       = $device.subscriberCarrier
+                        # "EAS activation ID"                       = $device.easDeviceId
                     }
                     $csvData.Add($deviceObject)
                 }
