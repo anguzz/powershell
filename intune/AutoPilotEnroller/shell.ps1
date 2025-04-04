@@ -1,11 +1,16 @@
 
-Write-Output "`n`n`n`n          :::     :::    ::: ::::::::::: ::::::::  :::::::::   :::::::: ::::::::::: 
-       :+: :+:   :+:    :+:     :+:    :+:    :+: :+:    :+: :+:    :+:    :+:      
-     +:+   +:+  +:+    +:+     +:+    +:+    +:+ +:+    +:+ +:+    +:+    +:+       
-   +#++:++#++: +#+    +:+     +#+    +#+    +:+ +#++:++#+  +#+    +:+    +#+        
-  +#+     +#+ +#+    +#+     +#+    +#+    +#+ +#+    +#+ +#+    +#+    +#+         
- #+#     #+# #+#    #+#     #+#    #+#    #+# #+#    #+# #+#    #+#    #+#          
-###     ###  ########      ###     ########  #########   ########     ###           `n`n`n`n"
+Write-Output "`n`n`n
+
+
+`t`t          :::     :::::::::  :::::::::: 
+`t`t       :+: :+:   :+:    :+: :+:         
+`t`t     +:+   +:+  +:+    +:+ +:+          
+`t`t   +#++:++#++: +#++:++#+  +#++:++#      
+`t`t  +#+     +#+ +#+        +#+            
+`t`t #+#     #+# #+#        #+#             
+`t`t###     ### ###        ##########          
+
+`n`n`n"
 
 do {
 
@@ -17,17 +22,20 @@ do {
 
     switch ($userChoice) {
         "1" {
-            # from https://learn.microsoft.com/en-us/autopilot/add-devices 
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 
             Install-Script -Name Get-WindowsAutopilotInfo -Force
 
+            Connect-MgGraph -scopes "Device.ReadWrite.All, DeviceManagementManagedDevices.ReadWrite.All, DeviceManagementServiceConfig.ReadWrite.All, Group.ReadWrite.All, GroupMember.ReadWrite.All"
+           
             Get-WindowsAutopilotInfo -Online
 
-            $deviceSerial=  Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber   
+            $deviceSerial=  Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber    
 
             Write-Output "Device enrollment initiated. Please check intune to verify device serial was added" 
+
+            Disconnect-Graph
         }
         "2"{
         Install-PackageProvider -Name NuGet -Confirm:$false -Force
