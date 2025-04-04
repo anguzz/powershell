@@ -26,14 +26,19 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
 } else {
     foreach ($device in $groupDevicesResponse.value) {
         $deviceID = $device.id
+        Write-Host "Device ID: $deviceID added"
+
+
         try {
-            $deviceDetailUri = "https://graph.microsoft.com/v1.0/devices/$deviceID`?`$select=id,displayName,operatingSystem,manufacturer,model,serialNumber"
+            $selectString= "id,displayName,operatingSystem,operatingSystemVersion,manufacturer,model,serialNumber"#makes script query a bit faster by not grabbing whole response per object
+            $deviceDetailUri = "https://graph.microsoft.com/v1.0/devices/$deviceID`?`$select=$selectString"
             $deviceResponse = Invoke-MgGraphRequest -Uri $deviceDetailUri -Method GET -OutputType PSObject
 
             $deviceObject = [PSCustomObject]@{
                 "Device ID" = $deviceResponse.id
                 "Device name" = $deviceResponse.displayName
                 "OS" = $deviceResponse.operatingSystem
+                "OS version" = $deviceResponse.OperatingSystemVersion
                 "Manufacturer" = $deviceResponse.manufacturer
                 "Model" = $deviceResponse.model
                 "Serial number" = $deviceResponse.serialNumber
