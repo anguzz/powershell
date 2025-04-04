@@ -2,6 +2,9 @@
 
 This PowerShell script provides a simple interface for enrolling devices into Windows Autopilot and generating Autopilot hardware hashes. It is designed to automate the generation and transfer of the hardware hash file, simplifying the device enrollment process for system administrators.
 
+![image](https://github.com/user-attachments/assets/81f82432-f385-4a33-9b15-ac150c4e8946)
+
+
 ## Overview
 
 Currently, when a new device during the out-of-box experience (OOBE) needs to be enrolled in Autopilot, a desktop support technician manually intervenes by using a shell (accessible via Shift+Fn+F10) to execute PowerShell commands or run a script. The script, generates a CSV hash file which then must be manually copied onto a USB drive by the technician. This hash file then has to be uploaded to intune 
