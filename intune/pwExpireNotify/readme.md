@@ -1,56 +1,114 @@
+# Password Expiration Notifier for Intune
+
 # Overview
-This Intune package proactively informs users when their passwords are nearing expiration by leveraging Microsoft Graph API calls. By fetching the last password change date for the signed-in user and comparing it with your organization’s password policy, this tool ensures that users are aware of the impending need to update their passwords. The process is automated to operate seamlessly in the background, minimizing disruptions while following security compliance across managed devices. The package is specifically designed to be deployed via Intune, ensuring a straightforward integration into existing enterprise management workflows.
+This Intune package proactively informs users when their Azure AD passwords are nearing expiration by leveraging Microsoft Graph API calls. It fetches the last password change date for the signed-in user and compares it with your organization’s password policy. The tool operates seamlessly in the background via a scheduled task, ensuring users receive timely notifications to update their passwords, thus maintaining security compliance across Intune-managed devices.
 
 # Features
-- Automatically fetches the currently signed-in user's UPN.
-- Uses Graph API to retrieve the last password change date.
-- Compares this date against your organization's password policy to determine if the password is nearing expiration.
-- Checks if the currently logged-in user account is enabled or disabled, with logic to handle disabled accounts in notifications.
-- Encrypts and stores the API client secret in system environment variables `Intune_Desktop_Notifications` for authentication
-- Decrypts the key in the checkExpire script during runtime. 
-- Ensures the scheduled task creation will execute until it has network to make the api call
-  
-![image](https://github.com/user-attachments/assets/c0b58dce-b996-4fb1-be25-00275ddb8e4d)
+- Automatically fetches the currently signed-in user's UPN (requires configuration in `checkExpire.ps1`).
+- Uses Microsoft Graph API to retrieve the user's last password change date (`lastPasswordChangeDateTime`).
+- Compares this date against your organization's configured password policy interval (`$PasswordPolicyInterval`).
+- Checks if the currently logged-in user account is enabled or disabled (`accountEnabled`) via Graph, tailoring notifications accordingly.
+- Required PowerShell modules are **bundled** with the package and copied during installation, avoiding runtime downloads.
+- Encrypts and stores the Entra App Registration client secret in a machine-level environment variable (`Intune_Desktop_Notifications_Secret`) for secure authentication.
+- Creates a scheduled task that runs as the logged-in user at logon to ensure notifications appear in the user's session.
+- Task settings ensure it runs even if the network isn't immediately available at logon, retrying later.
 
+![Notification Popup Example](https://github.com/user-attachments/assets/c0b58dce-b996-4fb1-be25-00275ddb8e4d)
+![Disabled Account Popup Example](https://github.com/user-attachments/assets/918019eb-0907-441f-b41c-546fc752496d)
 
-![image](https://github.com/user-attachments/assets/918019eb-0907-441f-b41c-546fc752496d)
+# Prerequisites
+1.  **Entra ID App Registration:**
+    * Create an App Registration in Microsoft Entra ID.
+    * Grant it the following **Application** permissions for Microsoft Graph:
+        * `User.Read.All` (Required to read `lastPasswordChangeDateTime` and `accountEnabled` for users).
+    * Grant Admin Consent for these permissions.
+    * Record the **Tenant ID**, **Application (client) ID**, and generate a **Client Secret**.
+2.  **AES Encryption Key:**
+    * Generate a secure 256-bit AES key and encode it as Base64. You can use PowerShell:
+        ```powershell
+        $key = New-Object byte[] 32
+        $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+        $rng.GetBytes($key)
+        $base64Key = [Convert]::ToBase64String($key)
+        Write-Host "Your Base64 Encoded AES Key: $base64Key"
+        ```
+    * Store this key securely; it's needed in `install.ps1`.
+3.  **Bundled PowerShell Modules:**
+    * On a machine with internet access, download the necessary modules and their dependencies. Using `Install-Module` 
 
+    * Copy the resulting module folders (e.g., `Microsoft.Graph.Authentication`, `Microsoft.Graph.Users`) into the `modules` subdirectory of this package source.
 
-# Usage
-- Set your `$userPrincipalName` variable by changing the `$domainEmailExtension`  in the `checkExpire.ps1` script
-- Set your organization's password expiration interval `$PasswordPolicyInterval` in the `checkExpire.ps1` script. Currently it's set as a default of 90 days. 
-- Adjust the `$destinationPath` variable used in all 3 scripts `detection.ps1` `install.ps1` and `uninstall.ps1`. Currently it's set as at a default location in the C drive at `C:\pwExNotify`  
-- Set the `$tenantID`, `$clientID` & `$client_secret` in the install.ps1 file
-- Run the `generateKey.ps1` file to generate an AES key, add the key in both `install.ps1` and `checkExpire.ps1`. This key is necessary for the `ConvertTo-Secure` string to read across System vs User contexts.  
-- Add your `logo.png` under files and modify the popup dimensions for it accordingly.
+# Configuration
+
+1.  **`install.ps1`:**
+    * Set `$ClientSecret`: Your Entra App Registration client secret.
+    * Set `$Base64AESKey`: The Base64 encoded AES key you generated.
+    * *(Optional)* Modify `$clientSecretEnvVarName` if desired (must match `checkExpire.ps1`).
+    * *(Optional)* Modify `$destinationPath` (must match `uninstall.ps1` and `detection.ps1`).
+    * *(Optional)* Modify `$logFilePath` for installation logs.
+2.  **`checkExpire.ps1` (inside the `files` folder):**
+    * Set `$tenantID`: Your Entra Tenant ID.
+    * Set `$clientID`: Your Entra App Registration Application (client) ID.
+    * Set `$clientSecretEnvVarName`: Must match the name used in `install.ps1`.
+    * Set `$domainEmailExtension`: The email domain suffix used to construct the UserPrincipalName (e.g., "@yourcompany.com").
+    * Set `$PasswordPolicyInterval`: Your organization's password expiration policy in days (e.g., `90`).
+    * *(Optional)* Modify `$WarnDaysBeforeExpiration`: How many days before expiration to start showing notifications.
+3.  **`uninstall.ps1`:**
+    * Ensure `$destinationPath`, `$logFilePath`, `$clientSecretEnvVarName`, and `$modulesToRemove` match the configuration used during installation.
+4.  **`files\Logo.png`:**
+    * Replace this with your organization's logo. Adjust dimensions in `popup.ps1` and `popup2.ps1` if needed.
+
+# Deployment via Intune (Win32 App)
+
+1.  **Prepare Package:** Ensure your directory structure matches the example below, including the `modules` folder populated from the prerequisites step. Create the `.intunewin` file using the Microsoft Win32 Content Prep Tool.
+2.  **Create Intune App:**
+    * Upload the `.intunewin` file.
+    * **Program:**
+        * Install command: `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
+        * Uninstall command: `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\uninstall.ps1`
+        * Install behavior: **System** (This is crucial for permissions to write to Program Files, ProgramData, set machine environment variables, and create tasks initially).
+        * Device restart behavior: No specific action.
+    * **Detection Rules:**
+        * Use a script detection rule (`detection.ps1`). This script should verify successful installation (e.g., check for the existence of `$destinationPath\checkExpire.ps1`, the scheduled task, or specific content in the install log). Configure the detection script to run as **System** and enforce script signature check **No**.
+    * **Dependencies:** None required within Intune if modules are bundled correctly.
+    * **Assignments:** Assign to target user or device groups.
+
+# How it Works
+
+-   **Installation (`install.ps1` running as SYSTEM):**
+    * Creates the destination folder (e.g., `C:\ProgramData\pwExpireNotifyClient`).
+    * Encrypts the provided client secret using the AES key and stores it as a machine-level environment variable.
+    * Copies the bundled PowerShell modules from the package's `modules` folder to the system-wide PowerShell module path (`C:\Program Files\WindowsPowerShell\Modules`).
+    * Copies the application scripts (`checkExpire.ps1`, `popup.ps1`, etc.) and logo into the destination folder.
+    * Creates a scheduled task (`CheckUserPasswordPolicy`) configured to run `checkExpire.ps1` at user logon. The task principal is set to the interactively logged-on user (detected via `explorer.exe` owner) to ensure notifications appear correctly.
+-   **Execution (`checkExpire.ps1` running as User via Scheduled Task):**
+    * Retrieves the encrypted client secret from the environment variable and decrypts it using the AES key embedded in the script.
+    * Connects to Microsoft Graph using the Tenant ID, Client ID, and decrypted Client Secret.
+    * Gets the logged-on user's UPN and queries Graph for `lastPasswordChangeDateTime` and `accountEnabled`.
+    * Calculates the password expiry date based on `$PasswordPolicyInterval`.
+    * If the password nears expiration (within `$WarnDaysBeforeExpiration`) and the account is enabled, triggers `popup.ps1`.
+    * If the account is disabled, triggers `popup2.ps1`.
+-   **Uninstallation (`uninstall.ps1` running as SYSTEM):**
+    * Removes the scheduled task.
+    * Removes the application directory (`$destinationPath`).
+    * Removes the machine-level environment variable.
+    * Removes the specific module folders (listed in `$modulesToRemove`) that were copied during installation from `C:\Program Files\WindowsPowerShell\Modules`.
 
 # Authentication
-This script utilizes connects to graph `Connect-MgGraph -TenantId $tenantID -ClientSecretCredential $credential` Ensure you setup an entra app with appropiate limited read access. The system-level environment variables to store the client secret where users cannot edit it, protecting it from unauthorized modification. Ensure your users do not have access to edit system level variables. The client secret is encrypted when stored as a system enviroment variable and decrypted during runtime. 
+Authentication to Microsoft Graph uses the Entra App Registration's Client ID and Client Secret. The secret is encrypted using AES-256 and stored in a machine-level environment variable (`Intune_Desktop_Notifications_Secret`) by the installation script (running as System). The `checkExpire.ps1` script (running as the user) retrieves and decrypts this secret at runtime using the key embedded within it. Ensure standard users do not have permissions to modify machine-level environment variables.
 
-# Deployment 
-- Deploy via Intune as an application. Call the `install.ps1` file after setting the appropiate variables. 
-- The `checkExpire.ps1` script is copied to the target device as `checkExpire.ps1` and placed in a secure folder after you set a destination path. 
--  It is executed as a scheduled task set up through the `install.ps1` script with system-level access to ensure it can access the graph application.
-- Installation success is confirmed by the creation of a log file at `C:\$desintationPath$\installLog.txt` which can be checked to verify correct installation in `detection.ps1`.
-
-- Only installs the necessary Microsoft.Graph modules for device authentication and updates NuGet to 2.8.5.201 for install compatibility on the target device to minimize module footprint.
-
-# Notifications 
-Notifications are enhanced with the `System.Windows.Forms.LinkLabel` class in the `popup.ps1` file, supporting hyperlinks and customizable UI elements such as font sizes and popup dimensions.
+# Notifications
+User notifications are handled by `popup.ps1` and `popup2.ps1`, utilizing `System.Windows.Forms` to create custom popups. `popup.ps1` includes a hyperlink (e.g., to your password reset portal). UI elements like window size and fonts can be customized within these scripts.
 
 # Script Details
 
-- `install.ps1`: Handles the setup of the directory, file copying, system variable creation and scheduled task registration. 
-- `uninstall.ps1`: Removes the scheduled task, directory, modules, and all its contents for a clean uninstallation.  
-- `detection.ps1`: Checks for installation success by verifying the presence of the task being succesfully created, meaning the install went through  
-#### Files Folder
-- `checkExpire.ps1`: Connects to Microsoft Graph, checks password expiration based on the set policy interval, and calls notifications accordingly. 
-- `popup.ps1`: Uses the `System.Windows.Forms.LinkLabel` module to call a popup informing the user to reset their password.
-- `popup2.ps1`: Seperate popup that gets called when the users account is locked or not enabled. `https://graph.microsoft.com/v1.0/me?$select=accountEnabled`
-- `generateKey.ps1` Generates an AES key used for encryption/decryption in different contexts. 
+-   `install.ps1`: (Run as System) Handles setup: creates directory, sets encrypted environment variable, copies bundled modules, copies application files, registers the user-context scheduled task.
+-   `uninstall.ps1`: (Run as System) Handles cleanup: removes scheduled task, application directory, environment variable, and copied module folders.
+-   `detection.ps1`: (Run as System) Used by Intune to verify successful installation (e.g., checks for key files or task existence).
+-   **`files\` Folder:** Contains files copied to the client.
+    -   `checkExpire.ps1`: Core logic - connects to Graph, checks password status, calls appropriate popup. Needs Tenant/Client ID configuration.
+    -   `popup.ps1`: Displays the standard "password nearing expiration" notification.
+    * `popup2.ps1`: Displays a notification if the user's account is found to be disabled.
+    * `Logo.png`: Your company logo displayed in the popups.
+-   **`modules\` Folder:** (Populate before packaging) Contains the pre-downloaded PowerShell modules (`Microsoft.Graph.Authentication`, `Microsoft.Graph.Users`, and their dependencies) required by `checkExpire.ps1`.
 
-
-# Run commands
-- Installer `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
-- Uninstaller `powershell -ex bypass -file uninstall.ps1`
-- Ensure system install with 64 bit powershell installation. 

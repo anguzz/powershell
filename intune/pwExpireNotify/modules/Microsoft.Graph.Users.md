@@ -1,0 +1,1 @@
+- Install-Module microsoft.graph.authentication and copy over from your device at C:\Program Files\WindowsPowerShell\Modules
