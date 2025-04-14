@@ -5,10 +5,20 @@
 
 Connect-MgGraph -Scopes "User.Read", "Group.ReadWrite.All", "Directory.ReadWrite.All"
 
-
 $GroupId = "" #add group id from entra here
 $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "devices.csv" #change to appropiate file name,
 $devices = Import-Csv -Path $csvPath
+
+
+$groupDisplayNameURL = "https://graph.microsoft.com/v1.0/groups/$GroupId`?`$select=displayName"
+$groupDisplayResponse = Invoke-MgGraphRequest -Uri $groupDisplayNameURL -Method GET -OutputType PSObject
+$groupDisplayName = $groupDisplayResponse.displayName
+
+Write-Output "`n-----------------------------------------------------------------`n"
+
+Write-Output "Beginning device onboarding to " $groupDisplayName
+Write-Output "Total devices to onboard: " $($devices.Count)
+Write-Output "`n-----------------------------------------------------------------`n"
 
 
 function Get-DeviceIdByDisplayName {
@@ -17,6 +27,8 @@ function Get-DeviceIdByDisplayName {
     )
 
     $device = Get-MgDevice -Filter "displayName eq '$DisplayName'" -Top 1
+    Write-output "Attemtping to add device with display name: $DisplayName"
+
     if ($device) {
         return $device.Id
     } else {
@@ -34,7 +46,6 @@ function Add-DeviceToGroup {
     )
 
     $deviceUrl = "https://graph.microsoft.com/v1.0/directoryObjects/$DeviceId"
-    Write-Host "Attempting to add device to group with URL: $deviceUrl"
 
     $params = @{
         "@odata.id" = $deviceUrl
@@ -52,8 +63,12 @@ function Add-DeviceToGroup {
 
 
 
+$row = 1
+
 foreach ($device in $devices) {
     $DeviceId = Get-DeviceIdByDisplayName -DisplayName $device.DeviceName
+    Write-Output "Device $row out of $($devices.Count): $($device.DeviceName)"
+
     if ($DeviceId) {
         $result = Add-DeviceToGroup -GroupId $GroupId -DeviceId $DeviceId
         if (-not $result) {
@@ -62,4 +77,7 @@ foreach ($device in $devices) {
     } else {
         Write-Host "Device ID not found for display name: $($device.DeviceName)"
     }
+
+    $row++
+    Write-Output "`n-----------------------------------------------------------------`n"
 }
