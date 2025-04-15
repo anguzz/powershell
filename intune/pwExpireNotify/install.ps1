@@ -1,6 +1,5 @@
 
 
-#Requires -RunAsAdministrator
 
 
 param (
