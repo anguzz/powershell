@@ -18,7 +18,7 @@ $moduleDestinationPath = "C:\Program Files\WindowsPowerShell\Modules"
 
 
 # --- Secret Configuration ---
-$clientSecretName = "Intune_Desktop_Notifications_Secret" 
+$clientSecretName = "Intune_Desktop_Notifications" 
 
 # --- Logging Setup ---
 # Ensure destination directory exists for logging
