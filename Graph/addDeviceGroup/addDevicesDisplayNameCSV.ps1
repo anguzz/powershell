@@ -1,5 +1,4 @@
 #adds a list of devices in a csv by their host name to an entra group
-#currently endpoint does not work
 #see devices.csv for format
 
 
@@ -26,16 +25,21 @@ function Get-DeviceIdByDisplayName {
         [string]$DisplayName
     )
 
-    $device = Get-MgDevice -Filter "displayName eq '$DisplayName'" -Top 1
-    Write-output "Attemtping to add device with display name: $DisplayName"
+    Write-Host "`nAttempting to find device with display name: $DisplayName" 
 
-    if ($device) {
-        return $device.Id
-    } else {
-        Write-Host "No device found with display name: $DisplayName"
+    try {
+        $device = Get-MgDevice -Filter "displayName eq '$DisplayName'" -Top 1 -ErrorAction Stop
+
+        if ($device) {
+            Write-Host "Device id found: $($device.Id)"
+            return $device.Id 
+        } else {
+            Write-Host "No device found with display name: $DisplayName"
+            return $null
+        }
+    } catch {
+        Write-Warning "Error retrieving device with display name '$DisplayName': $($_.Exception.Message)"
         return $null
-        #this return code returns null if display name is not found 
-        #in turn leads 
     }
 }
 
@@ -67,7 +71,6 @@ $row = 1
 
 foreach ($device in $devices) {
     $DeviceId = Get-DeviceIdByDisplayName -DisplayName $device.DeviceName
-    Write-Output "Device $row out of $($devices.Count): $($device.DeviceName)"
 
     if ($DeviceId) {
         $result = Add-DeviceToGroup -GroupId $GroupId -DeviceId $DeviceId
@@ -79,5 +82,6 @@ foreach ($device in $devices) {
     }
 
     $row++
+    Write-Output "Device $row out of $($devices.Count): $($device.DeviceName) processed"
     Write-Output "`n-----------------------------------------------------------------`n"
 }
