@@ -9,7 +9,7 @@ $SourceDirectory = "C:\ProgramData\amagent\"
 
 # --- Destination Settings ---
 # The exact name of the user's OneDrive sync folder. Find this in C:\Users\<username>\
-$OneDriveFolderName = "OneDrive - Foundation Building Materials"
+$OneDriveFolderName = "OneDrive - Company Name" # Example: "OneDrive - Contoso Inc."
 # The relative path INSIDE the OneDrive folder where backups should be stored.
 # Example: "Backups\AppLogs" will result in C:\Users\<user>\OneDrive...\Backups\AppLogs
 $OneDriveRelativePath = "Documents\Log-Exports"
