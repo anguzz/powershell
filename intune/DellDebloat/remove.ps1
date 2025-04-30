@@ -3,6 +3,7 @@
 # Stripped out the Dell sections from the following debloat script 
 # https://andrewstaylor.com/2022/08/09/removing-bloatware-from-windows-10-11-via-script/
 
+
 Write-Output " 
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_                                                     
     ____           __    __           ____           __      __                  __        
@@ -15,8 +16,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
                                                                                                       "
 
 
-
-    $UninstallPrograms = @(
+$UninstallPrograms = @(
         "Dell Optimizer"
         "Dell Power Manager"
         "DellOptimizerUI"
@@ -31,7 +31,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         "DellInc.DellDigitalDelivery"
         "DellInc.DellSupportAssistforPCs"
         "DellInc.PartnerPromo"
-        "Dell Command | Update"
+        #"Dell Command | Update"
         "Dell Command | Update for Windows Universal"
         "Dell Command | Update for Windows 10"
         "Dell Command | Power Manager"
@@ -83,136 +83,89 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
     }
 
+    ##Belt and braces, remove via CIM too
     foreach ($program in $UninstallPrograms) {
-        write-output "Removing $program if it exists via CIM..."
-        Get-CimInstance -Query "SELECT * FROM Win32_Product WHERE Name = '$program'" | Invoke-CimMethod -MethodName Uninstall -ErrorAction SilentlyContinue
+        write-output "Attempting to Removing $program via CIM if it exists"
+        Get-CimInstance -Query "SELECT * FROM Win32_Product WHERE name = '$program'" | Invoke-CimMethod -MethodName Uninstall
     }
 
+    ##Manual Removals
 
-    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall -ErrorAction SilentlyContinue | Get-ItemProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "Dell*Optimizer*Core" } | Select-Object -Property UninstallString
+    ##Dell Optimizer
+    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | Get-ItemProperty | Where-Object { $_.DisplayName -like "Dell*Optimizer*Core" } | Select-Object -Property UninstallString
 
     ForEach ($sa in $dellSA) {
         If ($sa.UninstallString) {
             try {
-                write-output "Attempting silent uninstall of Dell Optimizer Core using: $($sa.UninstallString)"
-                $procArgs = ($sa.UninstallString -replace '"', '') + " -silent" # Example, adjust silent flag as needed
-                Start-Process -FilePath ($procArgs.Split(' ')[0]) -ArgumentList ($procArgs.Split(' ', 2)[1]) -Wait -NoNewWindow -ErrorAction Stop
-                write-output "Dell Optimizer Core uninstall command executed."
+                cmd.exe /c $sa.UninstallString -silent
             }
             catch {
-                Write-Warning "Failed to uninstall Dell Optimizer Core using string: $($sa.UninstallString). Error: $($_.Exception.Message)"
+                Write-Warning "Failed to uninstall Dell Optimizer"
             }
         }
     }
 
 
     ##Dell Dell SupportAssist Remediation
-    # Note: QuietUninstallString is often more reliable for silent uninstalls if available
-    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall -ErrorAction SilentlyContinue | Get-ItemProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match "Dell SupportAssist Remediation" } | Select-Object -Property QuietUninstallString, UninstallString
+    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | Get-ItemProperty | Where-Object { $_.DisplayName -match "Dell SupportAssist Remediation" } | Select-Object -Property QuietUninstallString
 
     ForEach ($sa in $dellSA) {
-        $uninstallCmd = $sa.QuietUninstallString # Prefer QuietUninstallString
-        if (-not $uninstallCmd) { $uninstallCmd = $sa.UninstallString } # Fallback to UninstallString
-
-        If ($uninstallCmd) {
+        If ($sa.QuietUninstallString) {
             try {
-                 write-output "Attempting silent uninstall of Dell SupportAssist Remediation using: $uninstallCmd"
-                 # Assuming QuietUninstallString is already silent or UninstallString needs silent flags
-                 if ($uninstallCmd -match "msiexec") {
-                     $args = ($uninstallCmd -replace "/I", "/X ") -replace "msiexec.exe ",""
-                     $args += " /qn /norestart"
-                     Start-Process msiexec.exe -ArgumentList $args -Wait -NoNewWindow -ErrorAction Stop
-                 } else {
-                    # Heuristic: add common silent flags if not MSIEXEC
-                    $proc = ($uninstallCmd -replace '"','').Split(' ')[0]
-                    $args = ($uninstallCmd -replace '"','').Split(' ',2)[1]
-                    if ($args -notmatch '(/s|/S|/q|/Q|/quiet|/silent)') {$args += " /S"} # Common silent flag
-                     Start-Process -FilePath $proc -ArgumentList $args -Wait -NoNewWindow -ErrorAction Stop
-                 }
-                write-output "Dell SupportAssist Remediation uninstall command executed."
+                cmd.exe /c $sa.QuietUninstallString
             }
             catch {
-                Write-Warning "Failed to uninstall Dell Support Assist Remediation using string: $uninstallCmd. Error: $($_.Exception.Message)"
+                Write-Warning "Failed to uninstall Dell Support Assist Remediation"
             }
         }
     }
 
     ##Dell Dell SupportAssist OS Recovery Plugin for Dell Update
-    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall -ErrorAction SilentlyContinue | Get-ItemProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match "Dell SupportAssist OS Recovery Plugin for Dell Update" } | Select-Object -Property QuietUninstallString, UninstallString
+    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | Get-ItemProperty | Where-Object { $_.DisplayName -match "Dell SupportAssist OS Recovery Plugin for Dell Update" } | Select-Object -Property QuietUninstallString
 
     ForEach ($sa in $dellSA) {
-       $uninstallCmd = $sa.QuietUninstallString # Prefer QuietUninstallString
-        if (-not $uninstallCmd) { $uninstallCmd = $sa.UninstallString } # Fallback to UninstallString
-
-        If ($uninstallCmd) {
+        If ($sa.QuietUninstallString) {
             try {
-                 write-output "Attempting silent uninstall of Dell SupportAssist OS Recovery Plugin using: $uninstallCmd"
-                 if ($uninstallCmd -match "msiexec") {
-                     $args = ($uninstallCmd -replace "/I", "/X ") -replace "msiexec.exe ",""
-                     $args += " /qn /norestart"
-                     Start-Process msiexec.exe -ArgumentList $args -Wait -NoNewWindow -ErrorAction Stop
-                 } else {
-                     $proc = ($uninstallCmd -replace '"','').Split(' ')[0]
-                     $args = ($uninstallCmd -replace '"','').Split(' ',2)[1]
-                     if ($args -notmatch '(/s|/S|/q|/Q|/quiet|/silent)') {$args += " /S"}
-                     Start-Process -FilePath $proc -ArgumentList $args -Wait -NoNewWindow -ErrorAction Stop
-                 }
-                write-output "Dell SupportAssist OS Recovery Plugin uninstall command executed."
+                cmd.exe /c $sa.QuietUninstallString
             }
             catch {
-                Write-Warning "Failed to uninstall Dell SupportAssist OS Recovery Plugin using string: $uninstallCmd. Error: $($_.Exception.Message)"
+                Write-Warning "Failed to uninstall Dell Support Assist Remediation"
             }
         }
     }
 
+
+
     ##Dell Display Manager
-    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall -ErrorAction SilentlyContinue | Get-ItemProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "Dell*Display*Manager*" } | Select-Object -Property UninstallString
+    $dellSA = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | Get-ItemProperty | Where-Object { $_.DisplayName -like "Dell*Display*Manager*" } | Select-Object -Property UninstallString
 
     ForEach ($sa in $dellSA) {
         If ($sa.UninstallString) {
             try {
-                $uninstallCmd = $sa.UninstallString
-                write-output "Attempting silent uninstall of Dell Display Manager using: $uninstallCmd /S"
-                $proc = ($uninstallCmd -replace '"','').Split(' ')[0]
-                $args = ($uninstallCmd -replace '"','').Split(' ',2)[1]
-                $args += " /S" # Explicitly add /S for Dell Display Manager
-                Start-Process -FilePath $proc -ArgumentList $args -Wait -NoNewWindow -ErrorAction Stop
-                write-output "Dell Display Manager uninstall command executed."
+                cmd.exe /c $sa.UninstallString /S
             }
             catch {
-                Write-Warning "Failed to uninstall Dell Display Manager using string: $($sa.UninstallString). Error: $($_.Exception.Message)"
+                Write-Warning "Failed to uninstall Dell Optimizer"
             }
         }
     }
 
     ##Dell Peripheral Manager
-    $dpmPath = "C:\Program Files\Dell\Dell Peripheral Manager\Uninstall.exe"
-    if (Test-Path $dpmPath) {
-        try {
-            write-output "Attempting silent uninstall of Dell Peripheral Manager"
-            Start-Process -FilePath $dpmPath -ArgumentList "/S" -Wait -NoNewWindow -ErrorAction Stop
-             write-output "Dell Peripheral Manager uninstall command executed."
-        }
-        catch {
-            Write-Warning "Failed to uninstall Dell Peripheral Manager using $dpmPath /S. Error: $($_.Exception.Message)"
-        }
-    } else {
-        write-output "Dell Peripheral Manager uninstaller not found at $dpmPath"
+
+    try {
+        start-process c:\windows\system32\cmd.exe '/c "C:\Program Files\Dell\Dell Peripheral Manager\Uninstall.exe" /S'
+    }
+    catch {
+        Write-Warning "Failed to uninstall Dell Optimizer"
     }
 
 
     ##Dell Pair
-    $dpPath = "C:\Program Files\Dell\Dell Pair\Uninstall.exe"
-     if (Test-Path $dpPath) {
-        try {
-            write-output "Attempting silent uninstall of Dell Pair"
-            Start-Process -FilePath $dpPath -ArgumentList "/S" -Wait -NoNewWindow -ErrorAction Stop
-            write-output "Dell Pair uninstall command executed."
-        }
-        catch {
-            Write-Warning "Failed to uninstall Dell Pair using $dpPath /S. Error: $($_.Exception.Message)"
-        }
-     } else {
-         write-output "Dell Pair uninstaller not found at $dpPath"
-     }
+
+    try {
+        start-process c:\windows\system32\cmd.exe '/c "C:\Program Files\Dell\Dell Pair\Uninstall.exe" /S'
+    }
+    catch {
+        Write-Warning "Failed to uninstall Dell Optimizer"
+    }
 
