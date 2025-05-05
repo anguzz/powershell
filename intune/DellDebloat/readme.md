@@ -7,6 +7,10 @@ This Intune remediation package is designed to detect and remove Dell bloatware 
 # Overview
 `Remove.ps1`: This script removes a wide range of Dell applications, services, and AppX packages. It was built by stripping out Dell-specific logic from Andrew S. Taylor's debloat script at # https://github.com/andrew-s-taylor/public/blob/main/De-Bloat/RemoveBloat.ps1
 
+
+### `findDellDiscoveredApps.ps1`: Checks for the presence of Dell bloatware by inspecting:
+- Reporting tool to find instances of all Dell bloatware on all your intune endpoints and places them into a report to target for remediation 
+
 ### `Detection.ps1`: Checks for the presence of Dell bloatware by inspecting:
 - Installed and provisioned AppX packages
 
