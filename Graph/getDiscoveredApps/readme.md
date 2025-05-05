@@ -18,3 +18,11 @@ This PowerShell script is designed to connect to Microsoft Graph, retrieve a lis
 - Update the `$filter` variable with the target application's display name.
 - Adjust `$versionThreshold` to set your required minimum app version.
 - Run the script in a PowerShell environment with appropriate permissions
+
+# `findDiscoveredAppVersion.ps1` 
+- Finds all instances of a specific application version on all intune devices and puts them in a csv for reporting
+
+
+# `findDiscoveredAppsList.ps1`
+- Finds all instances of any application in a list `TargetAppNames` and puts them in a CSV for reporting. 
+- Note: The script will only search for the display name of the app, not the version or other properties.
