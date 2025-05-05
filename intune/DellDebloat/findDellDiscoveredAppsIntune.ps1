@@ -4,7 +4,7 @@
 
 $TenantId = ""
 
-$OutputCsvPath = "./NonCompliantAppsDevices.csv"
+$OutputCsvPath = "./DellBloatwareIntune.csv"
 
 $TargetAppNames = @(
     "Dell Command Update Catalog",
