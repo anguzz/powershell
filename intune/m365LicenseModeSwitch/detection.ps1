@@ -1,16 +1,16 @@
 $registryPath = "HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration"
 $keyName = "SharedComputerLicensing"
-$compliantValues = @("0", "1")  # 0 = user licensing, 1 = Microsoft default
+$expectedValue = "0" 
 
 if (Test-Path $registryPath) {
     try {
         $actualValue = (Get-ItemProperty -Path $registryPath -Name $keyName -ErrorAction Stop).$keyName
-        if ($compliantValues -contains $actualValue) {
-            Write-Host "SharedComputerLicensing is set to a user licensing value (`"$actualValue`")."
+        if ($actualValue -eq $expectedValue) {
+            Write-Host "SharedComputerLicensing is set to user licensing (`"$actualValue`")."
             exit 0  
         } else {
-            Write-Host "SharedComputerLicensing is set to a device licensing value (`"$actualValue`")."
-            exit 1  
+            Write-Host "SharedComputerLicensing is set to shared device licensing (`"$actualValue`")."
+            exit 1 
         }
     } catch {
         Write-Host "SharedComputerLicensing value not found."
