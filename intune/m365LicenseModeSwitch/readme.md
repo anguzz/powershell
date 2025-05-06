@@ -3,7 +3,7 @@
 # Device-based licensing for Microsoft 365 Apps intune application
 ### Modifies the follwing path. 
 - Path: `HKLM\SOFTWARE\Microsoft\Office\ClickToRun\Configuration`
-- Key: `SharedComputerLicensing` (DWORD)
+- Key: `SharedComputerLicensing` (REG_SZ / string) 
 
 ### Scripts 
 - `install.ps1` Sets SharedComputerLicensing to 0 to enforce user-based licensing.
@@ -20,6 +20,7 @@ To avoid writing to `HKLM:\SOFTWARE\WOW6432Node\` ensure you install/uninstall i
 
 
 # References:
+- Microsoft configuration file for [office deployment tool setting XML/Registry](https://learn.microsoft.com/en-us/microsoft-365-apps/licensing-activation/overview-shared-computer-activation).  
 
 - Colorado State University – [Office Device-Based Licensing Info](https://help.mail.colostate.edu/officedbs.aspx#:~:text=Looking%20at%20the%20Windows%20Registry%3A%201%20Open%20Regedit,value%20is%20set%20to%201%20as%20shown%20below%3A)
 

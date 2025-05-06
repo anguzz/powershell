@@ -9,6 +9,6 @@ if (Get-ItemProperty -Path $registryPath -Name $regName -ErrorAction SilentlyCon
     Set-ItemProperty -Path $registryPath -Name $regName -Value 0
     Write-Host "Updated existing SharedComputerLicensing value to 0 (user licensing)."
 } else {
-    New-ItemProperty -Path $registryPath -Name $regName -Value 0 -PropertyType DWORD -Force
+    New-ItemProperty -Path $registryPath -Name $regName -Value 0 -PropertyType String -Force
     Write-Host "Created SharedComputerLicensing value set to 0 (user licensing)."
 }

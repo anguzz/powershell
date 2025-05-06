@@ -10,6 +10,6 @@ if (Get-ItemProperty -Path $registryPath -Name $regName -ErrorAction SilentlyCon
     Set-ItemProperty -Path $registryPath -Name $regName -Value $defaultValue
     Write-Host "Reset SharedComputerLicensing to 1 (shared licensing default)."
 } else {
-    New-ItemProperty -Path $registryPath -Name $regName -Value $defaultValue -PropertyType DWORD -Force
+    New-ItemProperty -Path $registryPath -Name $regName -Value $defaultValue -PropertyType String -Force
     Write-Host "Created SharedComputerLicensing with default value 1 (shared licensing)."
 }
