@@ -12,6 +12,12 @@
 
 > Note: This registry value is not present by default unless Microsoft 365 Apps was installed with shared computer/device licensing enabled. This serves as a way to change the licensing without having to uninstall the application to enable/disable features needed by shared or user based licensing. 
 
+# Intune Deployment commands
+To avoid writing to `HKLM:\SOFTWARE\WOW6432Node\` ensure you install/uninstall in 64 bit powershell. 
+
+  - Install `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
+  - Uninstall `%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\uninstall.ps1`
+
 
 # References:
 
