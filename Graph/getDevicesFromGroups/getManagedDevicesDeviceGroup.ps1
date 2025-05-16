@@ -1,11 +1,6 @@
-$groupId = "" # User's Win11 group
-
-
+$groupId = "" 
 $csvData = New-Object System.Collections.Generic.List[Object]
 
-# --- END CONFIGURATION ---
-
-# Connect to Microsoft Graph
 try {
     Connect-MgGraph -Scopes "DeviceManagementManagedDevices.readwrite.All", "GroupMember.readwrite.All", "Group.readwrite.All", "Directory.readwrite.All" -TenantId $tenantID
     Write-Host "Successfully connected to Microsoft Graph." -ForegroundColor Green
@@ -34,7 +29,6 @@ Write-Output "Attempting to find Intune Managed Devices by their Display Name."
 Write-Warning "IMPORTANT: Device display names (deviceNames in Intune) are not guaranteed to be unique. If multiple devices share the same name, this script may report on the first one found or all if multiple are returned by the filter."
 Write-Output "`n-----------------------------------------------------------------`n"
 
-# Get Azure AD device objects from the group
 try {
     $groupMembersUri = "https://graph.microsoft.com/v1.0/groups/$groupId/members/microsoft.graph.device?`$select=id,displayName&`$top=999"
     $groupDevicesResponse = Invoke-MgGraphRequest -Uri $groupMembersUri -Method GET -OutputType PSObject -ErrorAction Stop
@@ -50,7 +44,11 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
     Write-Output "Found $($groupDevicesResponse.value.Count) Azure AD device(s) in group '$groupDisplayNameForReport'. Processing each..."
     Write-Output "`n-----------------------------------------------------------------`n"
 
+    $totalDevices = $groupDevicesResponse.value.Count
+    $counter = 1
+
     foreach ($azureAdDeviceEntry in $groupDevicesResponse.value) {
+    Write-Host "`n[$counter of $totalDevices] Processing device..."
         $azureAdDeviceId = $azureAdDeviceEntry.id
         $azureAdDeviceDisplayName = $azureAdDeviceEntry.displayName
 
@@ -76,6 +74,7 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
                     Write-Host "Found Intune managed device: '$($device.DeviceName)' (Intune ID: $($device.Id))" -ForegroundColor Green
 
                     try {
+                        # more info at https://learn.microsoft.com/en-us/graph/api/resources/intune-devices-hardwareinformation?view=graph-rest-beta
                         $managedDeviceUri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($device.id)?`$select=enrolledByUserPrincipalName,hardwareInformation"
                         $managedDeviceResponse = Invoke-MgGraphRequest -Uri $managedDeviceUri -Method GET -OutputType PSObject
 
@@ -135,12 +134,12 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
 
             $csvData.Add($deviceObject)
         }
+        $counter++
 
         Write-Output "---"
     }
 }
 
-# CSV Export Logic
 if ($csvData.Count -gt 0) {
     $currentDate = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
     $safeGroupDisplayName = $groupDisplayNameForReport -replace '[^a-zA-Z0-9]', '_'
