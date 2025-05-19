@@ -60,3 +60,7 @@ OutlookSignatureManager/
 - Works for Outlook desktop clients (no effect on mobile/web).
 - Signature updates require re-deployment.
 - Be sure to test before pushing org-wide.
+
+# Preview 
+
+![signature_screenshot](https://github.com/user-attachments/assets/fd8eb1a2-9b99-499b-95c9-f92ddc3b6fdb)
