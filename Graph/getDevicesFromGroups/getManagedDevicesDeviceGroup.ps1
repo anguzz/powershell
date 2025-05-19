@@ -74,19 +74,20 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
                     Write-Host "Found Intune managed device: '$($device.DeviceName)' (Intune ID: $($device.Id))" -ForegroundColor Green
 
                     try {
-                        # more info at https://learn.microsoft.com/en-us/graph/api/resources/intune-devices-hardwareinformation?view=graph-rest-beta
-                        $managedDeviceUri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($device.id)?`$select=enrolledByUserPrincipalName,hardwareInformation"
+                        $managedDeviceUri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($device.id)?`$select=enrolledByUserPrincipalName,hardwareInformation,physicalMemoryInBytes"
                         $managedDeviceResponse = Invoke-MgGraphRequest -Uri $managedDeviceUri -Method GET -OutputType PSObject
 
                         $wiredIPv4Addresses = $managedDeviceResponse.hardwareInformation.wiredIPv4Addresses | Out-String
                         $ipAddressV4        = $managedDeviceResponse.hardwareInformation.ipAddressV4        | Out-String
                         $subnetAddress      = $managedDeviceResponse.hardwareInformation.subnetAddress      | Out-String
                         $subnetAddress      = $managedDeviceResponse.hardwareInformation.subnetAddress      | Out-String
-
                         $subnetAddress      = $managedDeviceResponse.hardwareInformation.subnetAddress      | Out-String
                         $enrolledByUPN      = $managedDeviceResponse.enrolledByUserPrincipalName
                         $totalStorageSpaceInBytes = $managedDeviceResponse.hardwareInformation.totalStorageSpace
                         $freeStorageSpaceInBytes   = $managedDeviceResponse.hardwareInformation.freeStorageSpace
+                        $physicalMemoryInBytes     = $managedDeviceResponse.physicalMemoryInBytes
+                        # https://learn.microsoft.com/en-us/answers/questions/853673/microsoft-graph-api-physical-memory-info-for-manag
+                        # very jank, physical memory will not populate if not called WITH hardware info in the same api call. 
                     } catch {
                         Write-Warning "Failed to get hardware info for device ID: $($device.id). $_"
                         $wiredIPv4Addresses = $ipAddressV4 = $subnetAddress = $enrolledByUPN = "N/A"
@@ -104,6 +105,7 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
                         "Enrolled By UPN"     = $enrolledByUPN
                         "Stored Space"        = $totalStorageSpaceInBytes 
                         "Free Space"          = $freeStorageSpaceInBytes 
+                        "Physical Memory"    = $physicalMemoryInBytes
                         "Wired IPv4"          = $wiredIPv4Addresses.Trim()
                         "IPv4 Address"        = $ipAddressV4.Trim()
                         "Subnet"              = $subnetAddress.Trim()
@@ -117,8 +119,33 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
                     $csvData.Add($deviceObject)
                 }
             } else {
-                Write-Host "No Intune-managed device found with deviceName eq '$azureAdDeviceDisplayName' (for AAD Device ID: $azureAdDeviceId)"
-            }
+    Write-Host "No Intune-managed device found with deviceName eq '$azureAdDeviceDisplayName' (for AAD Device ID: $azureAdDeviceId)"
+
+    $deviceObject = [PSCustomObject]@{
+        "AAD Device Name"     = $azureAdDeviceDisplayName
+        "Intune Device Name"  = "Not intune managed"
+        "OS"                  = "-"
+        "OS version"          = "-"
+        "Manufacturer"        = "-"
+        "Model"               = "-"
+        "Serial number"       = "-"
+        "Primary user UPN"    = "-"
+        "Enrolled By UPN"     = "-"
+        "Stored Space"        = "-"
+        "Free Space"          = "-"
+        "Physical Memory"     = "-"
+        "Wired IPv4"          = "-"
+        "IPv4 Address"        = "-"
+        "Subnet"              = "-"
+        "Intune Device ID"    = "-"
+        "Azure AD Device ID"  = "-"
+        "AAD ID from Group"   = $azureAdDeviceId
+        "Management State"    = "Not Found"
+        "Last Sync"           = "-"
+    }
+
+    $csvData.Add($deviceObject)            
+    }
         } catch {
             $deviceErrorMessage = $_.Exception.Message
             Write-Warning "Failed to retrieve Intune device details for Azure AD Device '$azureAdDeviceDisplayName' (ID: $azureAdDeviceId). Error: $deviceErrorMessage"
@@ -140,6 +167,7 @@ if ($null -eq $groupDevicesResponse.value -or $groupDevicesResponse.value.Count 
     }
 }
 
+# CSV Export Logic
 if ($csvData.Count -gt 0) {
     $currentDate = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
     $safeGroupDisplayName = $groupDisplayNameForReport -replace '[^a-zA-Z0-9]', '_'
