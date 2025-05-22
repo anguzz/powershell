@@ -37,7 +37,7 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
     }
 }
 
-$logFilePath = "$($env:TEMP)\IntuneSignatureManagerForOutlook-Graph-log.txt"
+$logFilePath = "C:\Temp\OutlookSignatureLog.txt"
 Start-Transcript -Path $logFilePath -Force
 Write-ColoredHost "-----------------------------------------------------------------" -ForegroundColor $ColorSection
 Write-ColoredHost "SCRIPT STARTED: Outlook Signature Manager Installation" -ForegroundColor $ColorSection
@@ -51,48 +51,35 @@ Write-ColoredHost "-------------------------------------------------------------
 Write-Host "" 
 
 Write-ColoredHost "[NuGet Package Provider Check]" -ForegroundColor $ColorSection
+
 try {
-    Write-ColoredHost "Checking NuGet Package Provider..." -ForegroundColor $ColorInfo
-    $nuGetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
-    if (-not $nuGetProvider -or ($nuGetProvider.Version -lt [System.Version]'2.8.5.201')) {
-        Write-ColoredHost "Installing/Updating NuGet Package Provider (version 2.8.5.201 or newer)..." -ForegroundColor $ColorWarning
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force -ErrorAction Stop
-        Write-ColoredHost "NuGet Package Provider installed/updated successfully." -ForegroundColor $ColorSuccess
-    } else {
-        Write-ColoredHost "NuGet Package Provider is up to date (Version: $($nuGetProvider.Version))." -ForegroundColor $ColorSuccess
-    }
+    Write-ColoredHost "Installing/Updating NuGet Package Provider..." -ForegroundColor $ColorInfo
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope AllUsers -Force -ErrorAction Stop
+    Write-ColoredHost "NuGet Package Provider installed/updated successfully." -ForegroundColor $ColorSuccess
 }
 catch {
-    Write-Warning "Failed to install/update NuGet Package Provider. This might not be an issue on newer PowerShell versions. Error: $($_.Exception.Message)"
+    Write-Warning "NuGet installation failed: $($_.Exception.Message)"
 }
 Write-Host "" 
 
 Write-ColoredHost "[Microsoft Graph Module Installation]" -ForegroundColor $ColorSection
 $requiredGraphModules = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
+
 try {
-    Write-ColoredHost "Checking required Microsoft Graph modules: $($requiredGraphModules -join ', ')" -ForegroundColor $ColorInfo
-    $installedModules = Get-Module -ListAvailable
+    Write-ColoredHost "Installing required Microsoft Graph modules..." -ForegroundColor $ColorInfo
     foreach ($moduleName in $requiredGraphModules) {
-        if (-not ($installedModules.Name -contains $moduleName)) {
-            Write-ColoredHost "Installing $moduleName module..." -ForegroundColor $ColorWarning
-            Install-Module -Name $moduleName -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
-            Write-ColoredHost "$moduleName module installed successfully." -ForegroundColor $ColorSuccess
-        } else {
-            $installedVersion = ($installedModules | Where-Object Name -eq $moduleName | Select-Object -First 1).Version
-            Write-ColoredHost "$moduleName module already installed (Version: $installedVersion)." -ForegroundColor $ColorSuccess
-        }
+        Write-ColoredHost "Installing/Updating $moduleName..." -ForegroundColor $ColorWarning
+        Install-Module -Name $moduleName -Scope AllUsers -Force -AllowClobber -ErrorAction Stop
     }
-    Write-ColoredHost "Importing Microsoft Graph modules..." -ForegroundColor $ColorInfo
-    Import-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
-    Import-Module Microsoft.Graph.Users -ErrorAction SilentlyContinue
-    Write-ColoredHost "Microsoft Graph modules imported." -ForegroundColor $ColorSuccess
+
+    Write-ColoredHost "Modules installed. Skipping manual import (auto-imported with use)." -ForegroundColor $ColorSuccess
 }
 catch {
-    Write-Error "Failed to install/import required Microsoft Graph modules. Error: $($_.Exception.Message)"
+    Write-Error "Failed to install Microsoft Graph modules. Error: $($_.Exception.Message)"
     Stop-Transcript
     exit 1
 }
-Write-Host ""
+Write-Host "" 
 
 Write-ColoredHost "[Microsoft Graph Connection & User Data Retrieval]" -ForegroundColor $ColorSection
 $userProperties = @(

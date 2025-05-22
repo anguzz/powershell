@@ -36,7 +36,7 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
     }
 }
 
-$logFilePath = "C:\Temp\IntuneSignatureManagerForOutlook-Graph-log.txt"
+$logFilePath = "C:\Temp\OutlookSignatureLog.txt"
 Start-Transcript -Path $logFilePath -Append
 
 Write-ColoredHost "-----------------------------------------------------------------" -ForegroundColor $ColorSection
@@ -185,7 +185,7 @@ Write-ColoredHost "[Cleanup This Uninstallation Script's Log (Optional)]" -Foreg
 Write-ColoredHost "The log for this uninstallation session is at: $logFilePath" -ForegroundColor $ColorInfo
 Write-ColoredHost "This script does not automatically delete its own log file upon completion." -ForegroundColor $ColorInfo
 
-$installTimeLogFile = "C:\Temp\IntuneSignatureManagerForOutlook-Graph-log.txt" 
+$installTimeLogFile = "C:\Temp\OutlookSignatureLog.txt" 
 Write-ColoredHost "If you wish to clean up the main log file at '$installTimeLogFile', do so manually or via a separate process." -ForegroundColor $ColorInfo
 Write-ColoredHost "This script will not delete it automatically to preserve records." -ForegroundColor $ColorInfo
 Write-Host ""
