@@ -102,7 +102,7 @@ User notifications are handled by `popup.ps1` and `popup2.ps1`, utilizing `Syste
 
 # Script Details
 
--   `install.ps1`: (Run as System) Handles setup: creates directory, sets encrypted environment variable, copies bundled modules, copies application files, registers the user-context scheduled task.
+-   `install.ps1`: (Run as System) Handles setup: creates directory, sets encrypted environment variable, copies bundled modules, copies application files, registers the user-context scheduled task via an XML file `CheckUserPasswordPolicy.xml`.
 -   `uninstall.ps1`: (Run as System) Handles cleanup: removes scheduled task, application directory, environment variable, and copied module folders.
 -   `detection.ps1`: (Run as System) Used by Intune to verify successful installation (e.g., checks for key files or task existence).
 -   **`files\` Folder:** Contains files copied to the client.

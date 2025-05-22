@@ -125,79 +125,73 @@ foreach ($file in $filesToCopy) {
 }
 
 #--------------------------------------------------------------------------
-# scheduled Task Creation
+# Scheduled Task Creation using XML
 #--------------------------------------------------------------------------
-Write-Log "Configuring scheduled task 'CheckUserPasswordPolicy'..."
+Write-Log "Configuring scheduled task 'CheckUserPasswordPolicy' from XML..."
 
 $taskName = "CheckUserPasswordPolicy"
-$taskDescription = "Checks user password expiration status and provides notifications."
-$checkScriptFile = Join-Path $destinationPath "checkExpire.ps1"
+$taskXmlTemplateFile = Join-Path $scriptPath "taskXML\CheckUserPasswordPolicy.xml"
+$taskXmlDeployedFile = Join-Path $destinationPath "CheckUserPasswordPolicy_configured.xml"
 
-$taskAction = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$checkScriptFile`"" -ErrorAction Stop
+if (-not (Test-Path $taskXmlTemplateFile)) {
+    $msg = "FATAL: Missing task XML template at '$taskXmlTemplateFile'."
+    Write-Log $msg; Write-Error $msg; exit 1
+}
 
-# Define triggers for logon and startup
-$triggers = @(
-    New-ScheduledTaskTrigger -AtLogOn -ErrorAction Stop
-
-)
-
-$taskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable -StartWhenAvailable -DontStopOnIdleEnd
-
-
-$taskPrincipal = $null
+# Determine Principal User ID - Using Current User's SID for robustness
+$principalUserId = ""
 try {
-    $explorerProcess = Get-CimInstance Win32_Process -Filter "Name = 'explorer.exe'" | Select-Object -First 1
-    if ($explorerProcess) {
-        $ownerInfo = Invoke-CimMethod -InputObject $explorerProcess -MethodName GetOwner
-        if ($ownerInfo -and $ownerInfo.User) {
-            $domain = "DOMAIN" # add your domain here
-            $accountName = "$domain\$($ownerInfo.User)"
-            Write-Log "Attempting to set task principal to '$accountName' based on explorer.exe owner."
-            $taskPrincipal = New-ScheduledTaskPrincipal -UserId $accountName -LogonType Interactive -ErrorAction Stop
-        } else {
-             Write-Log "Could not determine owner from explorer.exe process."
-        }
-    } else {
-        Write-Log "explorer.exe process not found. Cannot determine user for scheduled task principal automatically."
+    $windowsIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $principalUserId = $windowsIdentity.User.Value # This is the SID string
+    if (-not $principalUserId) {
+        throw "Retrieved SID is empty."
     }
+    Write-Log "Successfully retrieved current user SID to use for task principal: $principalUserId"
 } catch {
-     Write-Log "Error detecting user principal: $($_.Exception.Message)"
+    Write-Log "WARNING: Failed to get current user SID: $($_.Exception.Message). Falling back to 'BUILTIN\Users'."
+    Write-Log "The task might not run with the intended specific user privileges if 'BUILTIN\Users' is used."
+    $principalUserId = "BUILTIN\Users" # Fallback - be aware of implications
 }
 
-if (-not $taskPrincipal) {
-  
-     $errorMessage = "Failed to determine user principal for the scheduled task. Cannot proceed."
-     Write-Log $errorMessage
-     Write-Error $errorMessage
-     exit 1
+Write-Log "Using Principal UserID for task XML: '$principalUserId'"
+
+# Replace token and save XML
+try {
+    $xmlContent = Get-Content $taskXmlTemplateFile -Raw -ErrorAction Stop
     
+    $placeholderRegex = '\{PRINCIPAL_USER_ID\}' 
+    if ($xmlContent -match $placeholderRegex) {
+        $xmlContent = $xmlContent -replace $placeholderRegex, [System.Security.SecurityElement]::Escape($principalUserId)
+        Write-Log "Successfully replaced placeholder '$placeholderRegex' in XML content."
+    } else {
+        Write-Log "WARNING: Placeholder '$placeholderRegex' not found in XML template '$taskXmlTemplateFile'. The UserId might not be set as intended."
+    }
+    
+    $xmlContent | Set-Content -Path $taskXmlDeployedFile -Encoding Unicode -Force -ErrorAction Stop
+    Write-Log "Configured task XML saved to '$taskXmlDeployedFile'."
+} catch {
+    $msg = "FATAL: Failed to process task XML template. Error: $($_.Exception.Message)"
+    Write-Log $msg; Write-Error $msg; exit 1
 }
 
+Write-Log "Unregistering existing task '$taskName' (if present)..."
+schtasks.exe /Delete /TN $taskName /F 2>&1 | Out-Null 
 
-if ($taskPrincipal) {
-    Write-Log "Registering scheduled task '$taskName'..."
-    try {
-        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue 
+Write-Log "Registering scheduled task '$taskName' from XML '$taskXmlDeployedFile'..."
+$schtasksOutput = schtasks.exe /Create /XML $taskXmlDeployedFile /TN $taskName /F 2>&1
 
-        Register-ScheduledTask -TaskName $taskName `
-            -Description $taskDescription `
-            -Principal $taskPrincipal `
-            -Action $taskAction `
-            -Trigger $triggers `
-            -Settings $taskSettings `
-            -Force `
-            -ErrorAction Stop
-
-        Write-Log "Scheduled task '$taskName' registered successfully."
-    } catch {
-        $errorMessage = "Failed to register scheduled task '$taskName'. Error: $($_.Exception.Message)"
-        Write-Log $errorMessage
-        Write-Error $errorMessage
-       
-    }
+if ($LASTEXITCODE -eq 0) {
+    Write-Log "Scheduled task '$taskName' created successfully."
 } else {
-     Write-Log "Skipping scheduled task registration because user principal could not be set."
+    $msg = "FATAL: Failed to create task '$taskName' (Exit Code: $LASTEXITCODE)."
+    Write-Log $msg
+    Write-Log "Schtasks.exe output: $schtasksOutput"
+    Write-Log "Content of deployed XML file '$taskXmlDeployedFile' that failed:"
+    Write-Log (Get-Content $taskXmlDeployedFile -Raw)
+    Write-Error $msg 
+    exit 1
 }
 
 Write-Log "======== Script Execution End ========"
-exit 0 
+exit 0
+
