@@ -52,6 +52,8 @@ $UninstallPrograms = @(
         "Dell SupportAssist Remediation"
         "Dell Update - SupportAssist Update Plugin"
         "DellInc.PartnerPromo"
+        "Dell Trusted Device Agent" #added 5/28/25
+        "Dell SupportAssist for Business PCs" #added 5/28/25
     )
 
 
