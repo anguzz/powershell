@@ -15,8 +15,8 @@ This script automates the download and execution of the Windows 11 Installation 
 
 `URL: https://go.microsoft.com/fwlink/?linkid=2171764`
  
-## Optional
-- To bypass TPM and CPU checks uncomment the following lines in the script, though this is not generally recommended. 
+## Optional: Bypass compatiblity checks
+- To bypass TPM and CPU checks as well Windows PC health check use `Win11InstallerForce.ps1` This file adds the following values, and fetches and changes the registry value for the current signed in user. 
   
   `New-ItemProperty -Path "HKEY_LOCAL_MACHINE\SYSTEM\Setup\MoSetup" -Name "AllowUpgradesWithUnsupportedTPMOrCPU" -PropertyType DWord -Value 1 -Force | Out-Null`
 
