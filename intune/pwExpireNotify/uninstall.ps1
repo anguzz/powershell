@@ -8,7 +8,7 @@
 $destinationPath = "C:\pwExpireNotifyClient" # app install directory
 $logFilePath = "C:\pwExpireNotifyClientLogs" #  log location (or choose C:\Windows\Temp or similar)
 $logFile = Join-Path $logFilePath "uninstall_pwExpireNotifyClient_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
-$moduleBasePath = Join-Path $env:ProgramFiles "WindowsPowerShell\Modules" 
+$moduleBasePath = "C:\Program Files\WindowsPowerShell\Modules"
 
 # --- Component Names ---
 $taskName = "CheckUserPasswordPolicy"
