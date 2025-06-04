@@ -3,7 +3,7 @@
 
 Deploy company-branded Outlook signatures via Intune.
 
-This solution lets you centrally manage and push Outlook signatures across your organization using a Win32 app deployment. The embedded image is Base64-encoded to ensure consistent rendering across devices and avoid mail firewall issues. User personalization is handled dynamically using Entra ID attributes.
+This solution lets you centrally manage and push Outlook signatures across your organization using a Win32 app deployment. The embedded image is Base64-encoded to ensure consistent rendering across devices and avoid mail firewall issues. User personalization is handled dynamically using Entra ID attributes. It's currently configured for Outlook 16 but can be reconfigured. 
 
 ---
 
