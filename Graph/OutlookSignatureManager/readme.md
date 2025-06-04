@@ -1,66 +1,128 @@
+
 # Outlook Signature Manager
-Deploy Outlook company signatures via Intune.
 
-This project lets you centrally manage and push Outlook signatures across your org using a Win32 app deployment. The image is embedded using Base64 for consistent rendering across devices and mail clients. It includes a utility tool to add embedded Base64 images that don't get blocked by mail firewall rules.
+Deploy company-branded Outlook signatures via Intune.
 
-The script detects the current user from the running `explorer.exe` process and queries their UPN in Entra ID. It then dynamically builds a signature using the user's Entra attributes—making the deployment fully personalized per user.
+This solution lets you centrally manage and push Outlook signatures across your organization using a Win32 app deployment. The embedded image is Base64-encoded to ensure consistent rendering across devices and avoid mail firewall issues. User personalization is handled dynamically using Entra ID attributes.
 
-# Requirements
+---
 
-This script requires an Entra app registration with the appropriate read permissions to query user attributes.
+## Overview
 
-Make sure to populate the following variables in `install.ps1`: 
+- Detects the currently signed-in user via the `explorer.exe` process.
+- Queries Entra ID to retrieve user attributes using Microsoft Graph.
+- Builds a personalized signature using those attributes.
+- Writes the signature to the appropriate local Outlook directories.
+- Sets the default signature via registry keys.
+
+---
+
+## Requirements
+
+- An Entra app registration with **User.Read.All** or equivalent Graph API read permissions.
+- Populate the following variables in `install.ps1`:
 
 ```powershell
-$tenantID          = "" 
-$clientID          = "" 
-$clientSecretValue = ""  
+$tenantID          = "<your-tenant-id>" 
+$clientID          = "<your-client-id>" 
+$clientSecretValue = "<your-client-secret>"  
 ```
 
--  Caution: While storing credentials in a script isn’t best practice, the risk is minimal here since it's deployed via the Intune Management Extension and the data is cleared shortly after execution. Ensure you have a seperate access token and application with minimal read permissions to minimize risk. 
+⚠️ Warning *While storing credentials in the script isn't best practice, this script runs under the Intune Management Extension and the secret is cleared post-execution. Use a dedicated app registration with minimum required permissions to reduce risk.*
 
-# Variable setup
-1) Use base64.ps1 to generate Base64 image strings for HTML embedding, copy paste this string to where I currently have a base64 string on `Standard.htm`
-2) Add company name in `Standard.txt` and at the bottom of `Standard.htm`
-3) Add href to your organizations link at the bottom of `Standard.htm` where I currently filled it in with this github link.
+---
 
-# Deployment
-1) Package the script and signature folder using the IntuneWinAppUtil tool.
-2) Upload install.intunewin to Intune and configure:
+## Variable Setup
 
-
-### scripts
-- `base64.ps1` - Encodes image assets into Base64
-- `detection.ps1` - Detection script for Intune to validate deployment 
-- `install.ps1` - Installs signature and dependencies at `C:\Users\Angel.Santoyo\AppData\Roaming\Microsoft\Signatures` and generates a log file at `C:\Temp\IntuneSignatureManagerForOutlook-Graph-log`
-- `uninstall.ps1` - Uninstalls signature at `C:\Users\Angel.Santoyo\AppData\Roaming\Microsoft\Signatures` and generates a log file at `C:\Temp\IntuneSignatureManagerForOutlook-Graph-log`
+1. Use `base64.ps1` to generate a Base64-encoded logo string and paste it into `Standard.htm`.
+2. Add your company name to `Standard.txt` and `Standard.htm`.
+3. Replace the footer link in `Standard.htm` with your organization’s URL. 
 
 
-### Install commands: 
-1) powershell.exe -ExecutionPolicy Bypass -File .\install.ps1
-2) powershell.exe -ExecutionPolicy Bypass -File .\uninstall.ps1
+---
 
-- Detection script: Use detection.ps1 to verify success by testing for filepath
+## Deployment Steps
 
-# Directory structure 
-``` powershell
+1. Package the project using **IntuneWinAppUtil**.
+2. Upload the resulting `.intunewin` package to Intune.
+3. Configure the app using the details below.
+
+### Install / Uninstall Commands
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\install.ps1
+powershell.exe -ExecutionPolicy Bypass -File .\uninstall.ps1
+```
+
+### Detection Rule
+
+Use `detection.ps1` to confirm successful deployment by checking for the signature path.
+
+---
+
+## Registry Configuration
+
+The script sets default signatures by modifying this path:
+
+```
+HKEY_USERS\<userSID>\Software\Microsoft\Office\<OutlookVersion>\Common\MailSettings
+```
+
+It sets the following values:
+
+```powershell
+$signatureName = "Company_Standard"
+$OutlookVersionForRegistry = "16.0"
+
+$loggedOnUser = (Get-WmiObject -Class Win32_ComputerSystem).UserName
+
+try {
+    $ntAccount = New-Object System.Security.Principal.NTAccount($loggedOnUser)
+    $userSID = $ntAccount.Translate([System.Security.Principal.SecurityIdentifier]).Value
+} catch {
+    Write-Error "Failed to resolve SID for $loggedOnUser. $_"
+    exit 1
+}
+
+$registryPath = "Registry::HKEY_USERS\$userSID\Software\Microsoft\Office\$OutlookVersionForRegistry\Common\MailSettings"
+
+try {
+    Write-ColoredHost "Setting default signature for new emails and replies/forwards..." -ForegroundColor $ColorInfo
+    Set-ItemProperty -Path $registryPath -Name "NewSignature" -Value $signatureName -ErrorAction Stop
+    Set-ItemProperty -Path $registryPath -Name "ReplySignature" -Value $signatureName -ErrorAction Stop
+    Write-ColoredHost "Default signature set successfully." -ForegroundColor $ColorSuccess
+} catch {
+    Write-Error "Failed to set default signature in registry. Error: $($_.Exception.Message)"
+}
+```
+
+---
+
+## Project Structure
+
+```
 OutlookSignatureManager/
-├── base64.ps1           # Encode images to Base64
-├── detection.ps1        # Intune detection logic
-├── install.ps1          # Main deployment script
-├── uninstall.ps1        # Cleans up signature
+├── base64.ps1           # Encodes images to Base64
+├── detection.ps1        # Intune detection script
+├── install.ps1          # Installs signature
+├── uninstall.ps1        # Uninstalls signature
 └── Signatures/
-    ├── Standard.htm     # HTML signature (with embedded image)
+    ├── Standard.htm     # HTML signature with Base64 image
     ├── Standard.rtf     # RTF version
     ├── Standard.txt     # Plain text version
-    └── Standard_files/  # Asset folder (e.g. logo)
+    └── Standard_files/  # Supporting assets (if any)
 ```
 
-# Notes
-- Works for Outlook desktop clients (no effect on mobile/web).
-- Signature updates require re-deployment.
-- Be sure to test before pushing org-wide.
+---
 
-# Preview 
+## Notes
+
+- Supports **Outlook desktop only** (no web/mobile support).
+- Signature updates require re-deployment.
+- Test with a few pilot devices before pushing to production.
+
+---
+
+## Preview
 
 ![signature_screenshot](https://github.com/user-attachments/assets/fd8eb1a2-9b99-499b-95c9-f92ddc3b6fdb)
