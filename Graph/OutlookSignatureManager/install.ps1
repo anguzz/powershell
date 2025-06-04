@@ -323,8 +323,9 @@ foreach ($item in $signatureFilesAndFolders) {
     Write-Host "" 
 }
 
-# ----------------------------------logic to make sure the signature is set as default for new emails and replies/forwards-------------------------------
+# ----------------------------------logic below will force the signature at the registry level and not allow user changes on the UI at all-------------------------------
 
+<# 
 $signatureName = "Standard" #
 
 $OutlookVersionForRegistry = "16.0" 
@@ -351,7 +352,7 @@ try {
 catch {
     Write-Error "Failed to set default signature in registry. Error: $($_.Exception.Message)"
 }
-
+#>
 Write-Host ""
 Write-ColoredHost "-----------------------------------------------------------------" -ForegroundColor $ColorSection
 Write-ColoredHost "SCRIPT FINISHED: Outlook Signature Manager Installation" -ForegroundColor $ColorSection
