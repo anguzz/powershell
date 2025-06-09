@@ -21,7 +21,7 @@ Function Write-ColoredHost {
     Write-Host $Message -ForegroundColor $ForegroundColor -BackgroundColor $BackgroundColor
 }
 
-# Ensure the script runs in 64-bit PowerShell if applicable
+# ensures the script runs in 64-bit PowerShell if applicable
 if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
     try {
         Write-ColoredHost "Attempting to relaunch in 64-bit PowerShell..." -ForegroundColor $ColorInfo
@@ -41,6 +41,7 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
 # Start logging
 $logFilePath = "C:\Temp\OutlookSignatureLog.txt"
 try {
+    
     Start-Transcript -Path $logFilePath 
 }
 catch {
@@ -56,13 +57,15 @@ Write-ColoredHost "Running as user: $(whoami)" -ForegroundColor $ColorInfo
 Write-ColoredHost "PowerShell version: $($PSVersionTable.PSVersion)" -ForegroundColor $ColorInfo
 Write-ColoredHost "PowerShell Bitness: $(if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') {'64-bit'} else {'32-bit'})" -ForegroundColor $ColorInfo
 Write-ColoredHost "-----------------------------------------------------------------" -ForegroundColor $ColorSection
-Write-Host "" 
+Write-Host "" # New line for readability
+
+
+ [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # --- NuGet Package Provider Check ---
 Write-ColoredHost "[NuGet Package Provider Check]" -ForegroundColor $ColorSection
 try {
     Write-ColoredHost "Checking/Installing/Updating NuGet Package Provider..." -ForegroundColor $ColorInfo
-    Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue | Out-Null # Check if it exists
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope AllUsers -Force -ErrorAction Stop
     Write-ColoredHost "NuGet Package Provider is available and up-to-date." -ForegroundColor $ColorSuccess
 }
@@ -94,16 +97,18 @@ catch {
     if (Get-Transcript) { Stop-Transcript }
     exit 1
 }
-Write-Host "" 
+Write-Host "" # New line
 
+# --- Microsoft Graph Connection and User Data Retrieval ---
 Write-ColoredHost "[Microsoft Graph Connection & User Data Retrieval]" -ForegroundColor $ColorSection
+# Define user properties to retrieve from Microsoft Graph
 $userProperties = @(
     "displayName", "givenName", "surname", "mail", "userPrincipalName",
     "mobilePhone", "businessPhones", "jobTitle", "department", "city",
     "state", "streetAddress", "postalCode", "country", "officeLocation"
 )
 
-$mgUserResponse = $null 
+$mgUserResponse = $null
 $userAttributes = $null
 
 try {
@@ -119,7 +124,6 @@ try {
     $credential = New-Object System.Management.Automation.PSCredential ($clientID, $secureSecret)
 
     Write-ColoredHost "Connecting with Tenant ID: $tenantID and Client ID: $clientID" -ForegroundColor $ColorInfo
-    # Check existing connection
     if (-not (Get-MgContext)) {
         Connect-MgGraph -TenantId $tenantID -ClientSecretCredential $credential -ErrorAction Stop
         Write-ColoredHost "Successfully connected to Microsoft Graph." -ForegroundColor $ColorSuccess
@@ -150,7 +154,7 @@ try {
     }
     
      $domainExtension = "@email.com"
-
+  
     Write-ColoredHost "Configured domain extension: $domainExtension (Ensure this is correct!)" -ForegroundColor $ColorWarning
 
     $userToCheck = "$currUser$domainExtension" 
@@ -159,12 +163,12 @@ try {
     $selectQuery = $userProperties -join ','
 
     $uri = "https://graph.microsoft.com/v1.0/users/$($userToCheck)?`$select=$($selectQuery)"
-
     Write-ColoredHost "Graph API Request URI: $uri" -ForegroundColor $ColorDebug
     Write-ColoredHost "Attempting to retrieve user: $userToCheck with properties: $($userProperties -join ', ')" -ForegroundColor $ColorInfo
     
     $mgUserResponse = Invoke-MgGraphRequest -Method GET -Uri $uri -ErrorAction Stop
     
+    # $mgUserResponse from Invoke-MgGraphRequest is the PSCustomObject containing the user properties
     if ($mgUserResponse) {
         Write-ColoredHost "Successfully retrieved user object for '$($mgUserResponse.DisplayName)' (UPN: $($mgUserResponse.UserPrincipalName))" -ForegroundColor $ColorSuccess
         $userAttributes = [PSCustomObject]@{
@@ -209,7 +213,6 @@ catch {
 }
 Write-Host ""
 
-# --- Outlook Signature Processing ---
 Write-ColoredHost "[Outlook Signature Processing]" -ForegroundColor $ColorSection
 if (-not $userAttributes) {
     Write-Error "User attributes not populated from Graph. Cannot proceed with signature creation."
@@ -217,7 +220,6 @@ if (-not $userAttributes) {
     exit 1
 }
 
-# Use the $currUser variable determined earlier for the path
 $signaturesPath = "C:\Users\$currUser\AppData\Roaming\Microsoft\Signatures"
 Write-ColoredHost "Target Outlook Signatures folder: $signaturesPath" -ForegroundColor $ColorInfo
 if (-not (Test-Path $signaturesPath)) {
@@ -235,7 +237,7 @@ if (-not (Test-Path $signaturesPath)) {
     Write-ColoredHost "Signatures folder already exists." -ForegroundColor $ColorSuccess
 }
 
-$scriptRootSignaturesPath = Join-Path -Path $PSScriptRoot -ChildPath "Signatures" # Assumes a "Signatures" subfolder in the script's location
+$scriptRootSignaturesPath = Join-Path -Path $PSScriptRoot -ChildPath "Signatures" # assumes "Signatures" subfolder in the script's location
 Write-ColoredHost "Signatures source template path: $scriptRootSignaturesPath" -ForegroundColor $ColorInfo
 if (-not (Test-Path $scriptRootSignaturesPath)) {
     Write-Error "Signatures source folder not found at '$scriptRootSignaturesPath'. Ensure it exists and contains your signature templates and assets."
@@ -255,23 +257,45 @@ Write-Host ""
 Function Get-SafeAttributeString {
     param($AttributeValue)
     if ($null -eq $AttributeValue -or ([string]::IsNullOrWhiteSpace($AttributeValue.ToString()))) { return "" }
-    return ($AttributeValue | Out-String).Trim() 
+    return ($AttributeValue | Out-String).Trim() # out-String can be verbose, direct .ToString() might be better if not an array
 }
 
 foreach ($item in $signatureFilesAndFolders) {
     $itemName = $item.Name
     $itemFullName = $item.FullName
     
-    if ($item.PSIsContainer) { 
+    $userEmail = Get-SafeAttributeString $userAttributes.Mail
+    if ([string]::IsNullOrWhiteSpace($userEmail)) {
+        Write-Warning "User email from Graph is empty. Cannot rename signature files as requested. Skipping '$itemName'."
+        continue 
+    }
+
+    if ($item.PSIsContainer) {
         Write-ColoredHost "Processing asset directory: '$itemName'" -ForegroundColor $ColorInfo
-        $destinationDir = Join-Path -Path $signaturesPath -ChildPath $itemName
-        try {
-            Write-ColoredHost "Copying directory '$itemFullName' to '$destinationDir'..." -ForegroundColor $ColorDebug
-            Copy-Item -Path $itemFullName -Destination $destinationDir -Recurse -Force -ErrorAction Stop
-            Write-ColoredHost "Successfully copied directory '$itemName' to '$destinationDir'." -ForegroundColor $ColorSuccess
-        }
-        catch {
-            Write-Error "Failed to copy directory '$itemFullName' to '$destinationDir'. Error: $($_.Exception.Message)"
+        
+        if ($itemName -like "*_files") {
+            $baseName = $itemName -replace '_files$', '' 
+            $newFolderName = "$baseName ($userEmail)_files" # create "Standard (email@domain.com)_files"
+            $destinationDir = Join-Path -Path $signaturesPath -ChildPath $newFolderName
+            
+            try {
+                Write-ColoredHost "Copying directory '$itemFullName' to '$destinationDir'..." -ForegroundColor $ColorDebug
+                Copy-Item -Path $itemFullName -Destination $destinationDir -Recurse -Force -ErrorAction Stop
+                Write-ColoredHost "Successfully copied and renamed directory '$itemName' to '$destinationDir'." -ForegroundColor $ColorSuccess
+            }
+            catch {
+                Write-Error "Failed to copy directory '$itemFullName' to '$destinationDir'. Error: $($_.Exception.Message)"
+            }
+        } else {
+            $destinationDir = Join-Path -Path $signaturesPath -ChildPath $itemName
+            try {
+                Write-ColoredHost "Copying directory '$itemFullName' to '$destinationDir'..." -ForegroundColor $ColorDebug
+                Copy-Item -Path $itemFullName -Destination $destinationDir -Recurse -Force -ErrorAction Stop
+                Write-ColoredHost "Successfully copied directory '$itemName' to '$destinationDir'." -ForegroundColor $ColorSuccess
+            }
+            catch {
+                Write-Error "Failed to copy directory '$itemFullName' to '$destinationDir'. Error: $($_.Exception.Message)"
+            }
         }
     }
     elseif ($item.Name -like "*.htm" -or $item.Name -like "*.rtf" -or $item.Name -like "*.txt") { # If it's a template file
@@ -280,7 +304,6 @@ foreach ($item in $signatureFilesAndFolders) {
             $signatureFileContent = Get-Content -Path $itemFullName -Raw -ErrorAction Stop
             
             Write-ColoredHost "  Replacing placeholders in '$itemName'..." -ForegroundColor $ColorDebug
-            # Replace placeholder values using the $userAttributes custom object
             $signatureFileContent = $signatureFileContent -replace "%DisplayName%", (Get-SafeAttributeString $userAttributes.DisplayName)
             $signatureFileContent = $signatureFileContent -replace "%GivenName%", (Get-SafeAttributeString $userAttributes.GivenName)
             $signatureFileContent = $signatureFileContent -replace "%Surname%", (Get-SafeAttributeString $userAttributes.Surname)
@@ -296,11 +319,15 @@ foreach ($item in $signatureFilesAndFolders) {
             $signatureFileContent = $signatureFileContent -replace "%State%", (Get-SafeAttributeString $userAttributes.State)
             $signatureFileContent = $signatureFileContent -replace "%PhysicalDeliveryOfficeName%", (Get-SafeAttributeString $userAttributes.PhysicalDeliveryOfficeName)
 
-            $destinationPath = Join-Path -Path $signaturesPath -ChildPath $itemName
+            $baseName = [System.IO.Path]::GetFileNameWithoutExtension($itemName) # Get "Standard"
+            $extension = $item.Extension # Get ".htm"
+            $newFileName = "$baseName ($userEmail)$extension" # Create "Standard (email@domain.com).htm"
+            $destinationPath = Join-Path -Path $signaturesPath -ChildPath $newFileName
+
             Write-ColoredHost "  Saving updated signature to: '$destinationPath'" -ForegroundColor $ColorDebug
             # Ensure UTF8 encoding for HTM/TXT files, RTF is binary so -Encoding might not be ideal or needed.
             if ($item.Extension -eq ".rtf") {
-                Set-Content -Path $destinationPath -Value $signatureFileContent -Force -ErrorAction Stop 
+                Set-Content -Path $destinationPath -Value $signatureFileContent -Force -ErrorAction Stop
             } else {
                 Set-Content -Path $destinationPath -Value $signatureFileContent -Force -Encoding UTF8 -ErrorAction Stop
             }
@@ -320,13 +347,12 @@ foreach ($item in $signatureFilesAndFolders) {
             Write-Error "Failed to copy file '$itemFullName' to '$destinationFile'. Error: $($_.Exception.Message)"
         }
     }
-    Write-Host "" 
+    Write-Host "" # New line for readability between items
 }
 
-# ----------------------------------logic below will force the signature at the registry level and not allow user changes on the UI at all-------------------------------
-
+# ----------------------------------logic to make sure the signature is set as default for new emails and replies/forwards-------------------------------
 <# 
-$signatureName = "Standard" #
+$signatureName = "Standard" 
 
 $OutlookVersionForRegistry = "16.0" 
 
@@ -351,8 +377,8 @@ try {
 }
 catch {
     Write-Error "Failed to set default signature in registry. Error: $($_.Exception.Message)"
-}
-#>
+}#>
+
 Write-Host ""
 Write-ColoredHost "-----------------------------------------------------------------" -ForegroundColor $ColorSection
 Write-ColoredHost "SCRIPT FINISHED: Outlook Signature Manager Installation" -ForegroundColor $ColorSection

@@ -121,6 +121,14 @@ OutlookSignatureManager/
 - Signature updates require re-deployment.
 - Test with a few pilot devices before pushing to production.
 
+
+Files would end copied into `C:\Users\env:username\AppData\Roaming\Microsoft\Signatures`
+```bash
+Standard (angel.santoyo@email.com).htm
+Standard (angel.santoyo@email.com).rtf
+Standard (angel.santoyo@email.com).txt
+Standard (angel.santoyo@email.com)_files 
+```
 ---
 
 ## Preview

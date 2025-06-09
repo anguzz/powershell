@@ -1,4 +1,4 @@
-
+# --- Color Definitions ---
 $ColorInfo    = "Cyan"
 $ColorSuccess = "Green"
 $ColorWarning = "Yellow"
@@ -36,8 +36,8 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
     }
 }
 
-$logFilePath = "C:\Temp\OutlookSignatureLog.txt"
-Start-Transcript -Path $logFilePath -Append
+$logFilePath = "C:\Temp\OutlookSignatureLog.txt" 
+Start-Transcript -Path $logFilePath -Append 
 
 Write-ColoredHost "-----------------------------------------------------------------" -ForegroundColor $ColorSection
 Write-ColoredHost "SCRIPT STARTED: Outlook Signature Manager Uninstallation (Manual User Path)" -ForegroundColor $ColorSection
@@ -52,13 +52,13 @@ Write-Host ""
 
 Write-ColoredHost "[User Profile Detection for Signature Path]" -ForegroundColor $ColorSection
 $currUser = $null
-$userSignaturesPath = $null # Initialize to null
+$userSignaturesPath = $null
 
 try {
     Write-ColoredHost "Attempting to identify the active logged-in user (owner of explorer.exe)..." -ForegroundColor $ColorInfo
     $explorerProcess = Get-CimInstance Win32_Process -Filter "Name = 'explorer.exe' AND SessionId = '$(Get-WmiObject win32_computersystem -Property UserName | Select-Object -ExpandProperty UserName | Split-Path -Leaf)\*'" -ErrorAction SilentlyContinue | Select-Object -First 1
     
-    if (-not $explorerProcess) {
+    if (-not $explorerProcess) { 
          $explorerProcess = Get-CimInstance Win32_Process -Filter "Name = 'explorer.exe'" -ErrorAction SilentlyContinue | Select-Object -First 1
     }
 
@@ -89,49 +89,69 @@ Write-ColoredHost "[Outlook Signature File & Folder Removal]" -ForegroundColor $
 
 if (-not $userSignaturesPath) {
     Write-ColoredHost "User-specific signatures path could NOT be determined. Skipping removal of signature files and folders." -ForegroundColor $ColorError
-    Write-ColoredHost "This usually means the script could not identify the logged-in user who owns explorer.exe." -ForegroundColor $ColorError
 } elseif (-not (Test-Path $userSignaturesPath)) {
-    Write-ColoredHost "User's Outlook Signatures folder '$userSignaturesPath' does not exist. No signature files/folders to remove from this path." -ForegroundColor $ColorInfo
+    Write-ColoredHost "User's Outlook Signatures folder '$userSignaturesPath' does not exist. No signature files/folders to remove." -ForegroundColor $ColorInfo
 } else {
     Write-ColoredHost "Confirmed user's Outlook Signatures folder exists at '$userSignaturesPath'." -ForegroundColor $ColorSuccess
-    Write-ColoredHost "Source path for signature item names (from deployment package): '$scriptRootSignaturesSourcePath'" -ForegroundColor $ColorInfo
-    Write-ColoredHost "This script expects '$scriptRootSignaturesSourcePath' to contain items with the *exact names* of signatures/assets to be removed." -ForegroundColor $ColorWarning
+    Write-ColoredHost "Source path for signature patterns: '$scriptRootSignaturesSourcePath'" -ForegroundColor $ColorInfo
+    Write-ColoredHost "This script will use item names from the source folder to find and remove matching signatures." -ForegroundColor $ColorWarning
     Write-Host ""
 
     if (-not (Test-Path $scriptRootSignaturesSourcePath)) {
-        Write-ColoredHost "The 'Signatures' subfolder (source list) was NOT found at '$scriptRootSignaturesSourcePath'." -ForegroundColor $ColorError
-        Write-ColoredHost "This script relies on that folder to know which signature items to remove." -ForegroundColor $ColorError
-        Write-ColoredHost "No signature items will be removed from '$userSignaturesPath' without this source list." -ForegroundColor $ColorError
+        Write-ColoredHost "The 'Signatures' subfolder (source for patterns) was NOT found at '$scriptRootSignaturesSourcePath'." -ForegroundColor $ColorError
+        Write-ColoredHost "Cannot determine which signature patterns to remove from '$userSignaturesPath'." -ForegroundColor $ColorError
     } else {
-        Write-ColoredHost "Found the 'Signatures' subfolder at '$scriptRootSignaturesSourcePath'. Reading items to be deleted..." -ForegroundColor $ColorInfo
-        $deployedItems = Get-ChildItem -Path $scriptRootSignaturesSourcePath -ErrorAction SilentlyContinue
+        Write-ColoredHost "Found 'Signatures' subfolder. Reading items to create removal patterns..." -ForegroundColor $ColorInfo
+        $sourceItems = Get-ChildItem -Path $scriptRootSignaturesSourcePath -ErrorAction SilentlyContinue
 
-        if (-not $deployedItems) {
-            Write-ColoredHost "No items (files or folders) found in the source 'Signatures' path '$scriptRootSignaturesSourcePath'." -ForegroundColor $ColorWarning
-            Write-ColoredHost "Cannot determine which specific signatures to remove from '$userSignaturesPath'." -ForegroundColor $ColorWarning
+        if (-not $sourceItems) {
+            Write-ColoredHost "No items found in the source 'Signatures' path. Cannot determine which signatures to remove." -ForegroundColor $ColorWarning
         } else {
-            Write-ColoredHost "Attempting to remove the following items (if they exist) from '$userSignaturesPath':" -ForegroundColor $ColorInfo
-            $deployedItems | ForEach-Object { Write-ColoredHost "- $($_.Name)" -ForegroundColor $ColorInfo }
-            Write-Host ""
+            foreach ($itemInSource in $sourceItems) {
+                $sourceItemName = $itemInSource.Name
 
-            foreach ($itemInSource in $deployedItems) {
-                $itemName = $itemInSource.Name
-                $targetItemPathInUserSignatures = Join-Path -Path $userSignaturesPath -ChildPath $itemName
-                
-                Write-ColoredHost "Processing '$itemName' (from source folder):" -ForegroundColor $ColorDebug
-                if (Test-Path $targetItemPathInUserSignatures) {
-                    Write-ColoredHost "  Attempting to remove: '$targetItemPathInUserSignatures'" -ForegroundColor $ColorInfo
-                    try {
-                        Remove-Item -Path $targetItemPathInUserSignatures -Recurse -Force -ErrorAction Stop
-                        Write-ColoredHost "  Successfully removed '$targetItemPathInUserSignatures'." -ForegroundColor $ColorSuccess
-                    }
-                    catch {
-                        Write-ColoredHost "  Failed to remove '$targetItemPathInUserSignatures'. Error: $($_.Exception.Message)" -ForegroundColor $ColorError
+                if ($itemInSource.PSIsContainer) {
+                    $baseName = $sourceItemName -replace '_files$', ''
+                    $wildcardPattern = "$baseName (*)_files"
+                    Write-ColoredHost "Searching for directories matching pattern: '$wildcardPattern'" -ForegroundColor $ColorDebug
+                    
+                    $foldersToDelete = Get-ChildItem -Path $userSignaturesPath -Filter $wildcardPattern -Directory -ErrorAction SilentlyContinue
+                    if ($foldersToDelete) {
+                        foreach ($folder in $foldersToDelete) {
+                            Write-ColoredHost "  Attempting to remove directory: '$($folder.FullName)'" -ForegroundColor $ColorInfo
+                            try {
+                                Remove-Item -Path $folder.FullName -Recurse -Force -ErrorAction Stop
+                                Write-ColoredHost "  Successfully removed '$($folder.FullName)'." -ForegroundColor $ColorSuccess
+                            } catch {
+                                Write-ColoredHost "  Failed to remove '$($folder.FullName)'. Error: $($_.Exception.Message)" -ForegroundColor $ColorError
+                            }
+                        }
+                    } else {
+                        Write-ColoredHost "  No directories matching pattern '$wildcardPattern' were found." -ForegroundColor $ColorDebug
                     }
                 } else {
-                    Write-ColoredHost "  Item '$itemName' not found in the user's signatures folder ('$targetItemPathInUserSignatures'). Skipping." -ForegroundColor $ColorDebug
+                    # source file, e.g., "Standard.htm"
+                    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($sourceItemName)
+                    $extension = $itemInSource.Extension
+                    $wildcardPattern = "$baseName (*)$extension"
+                    Write-ColoredHost "Searching for files matching pattern: '$wildcardPattern'" -ForegroundColor $ColorDebug
+
+                    $filesToDelete = Get-ChildItem -Path $userSignaturesPath -Filter $wildcardPattern -File -ErrorAction SilentlyContinue
+                    if ($filesToDelete) {
+                        foreach ($file in $filesToDelete) {
+                            Write-ColoredHost "  Attempting to remove file: '$($file.FullName)'" -ForegroundColor $ColorInfo
+                            try {
+                                Remove-Item -Path $file.FullName -Force -ErrorAction Stop
+                                Write-ColoredHost "  Successfully removed '$($file.FullName)'." -ForegroundColor $ColorSuccess
+                            } catch {
+                                Write-ColoredHost "  Failed to remove '$($file.FullName)'. Error: $($_.Exception.Message)" -ForegroundColor $ColorError
+                            }
+                        }
+                    } else {
+                        Write-ColoredHost "  No files matching pattern '$wildcardPattern' were found." -ForegroundColor $ColorDebug
+                    }
                 }
-                Write-Host "" 
+                Write-Host "" # New line for readability
             }
         }
     }
@@ -140,53 +160,47 @@ Write-Host ""
 
 
 # --- Uninstall Microsoft Graph Modules ---
-<#
-
+<# 
 Write-ColoredHost "[Microsoft Graph Module Uninstallation]" -ForegroundColor $ColorSection
 $graphModulesToUninstall = @("Microsoft.Graph.Authentication", "Microsoft.Graph.Users")
 Write-ColoredHost "Attempting to uninstall Microsoft Graph modules: $($graphModulesToUninstall -join ', ')" -ForegroundColor $ColorInfo
-Write-ColoredHost "Note: Modules will be uninstalled for the CurrentUser scope if found." -ForegroundColor $ColorInfo
+Write-ColoredHost "Note: This will attempt to uninstall modules for the scope in which they were installed (AllUsers or CurrentUser)." -ForegroundColor $ColorInfo
 Write-Host ""
 
 foreach ($moduleName in $graphModulesToUninstall) {
-    Write-ColoredHost "Checking if module '$moduleName' is installed for CurrentUser..." -ForegroundColor $ColorDebug
+    Write-ColoredHost "Checking if module '$moduleName' is installed..." -ForegroundColor $ColorDebug
     try {
-        # Check if the module is installed for the current user (which might be SYSTEM if run by Intune)
-        # If modules were installed with -Scope CurrentUser during install, this needs to run in user context for uninstall,
-        # or the install script needs to install for AllUsers if Intune runs install as SYSTEM.
-        # For now, assuming it tries to uninstall from scope CurrentUser (effective user running the script).
-        $installedModule = Get-InstalledModule -Name $moduleName -Scope CurrentUser -ErrorAction SilentlyContinue
+        # Get-InstalledModule can find modules in any scope
+        $installedModule = Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue
         
         if ($installedModule) {
-            Write-ColoredHost "Module '$moduleName' is installed (Version: $($installedModule.Version)) in CurrentUser scope. Attempting to uninstall..." -ForegroundColor $ColorInfo
+            Write-ColoredHost "Module '$moduleName' is installed (Version: $($installedModule.Version), Scope: $($installedModule.InstalledLocation)). Attempting to uninstall..." -ForegroundColor $ColorInfo
             try {
                 Uninstall-Module -Name $moduleName -AllVersions -Force -Confirm:$false -ErrorAction Stop
-                Write-ColoredHost "Successfully uninstalled module '$moduleName' from CurrentUser scope." -ForegroundColor $ColorSuccess
+                Write-ColoredHost "Successfully uninstalled module '$moduleName'." -ForegroundColor $ColorSuccess
             }
             catch {
-                Write-ColoredHost "Failed to uninstall module '$moduleName' from CurrentUser scope. Error: $($_.Exception.Message)" -ForegroundColor $ColorWarning
+                Write-ColoredHost "Failed to uninstall module '$moduleName'. Error: $($_.Exception.Message)" -ForegroundColor $ColorWarning
                 Write-ColoredHost "You may need to remove it manually or check permissions. Ensure no PowerShell sessions are currently using the module." -ForegroundColor $ColorWarning
             }
         } else {
-            Write-ColoredHost "Module '$moduleName' is not installed for CurrentUser scope. Skipping uninstallation for this scope." -ForegroundColor $ColorDebug
+            Write-ColoredHost "Module '$moduleName' is not installed. Skipping." -ForegroundColor $ColorDebug
         }
     }
     catch {
-        # This catch block is for errors from Get-InstalledModule itself
-        Write-ColoredHost "Could not check or uninstall module '$moduleName' for CurrentUser scope. Error: $($_.Exception.Message)" -ForegroundColor $ColorWarning
-        Write-ColoredHost "This might happen if PowerShellGet module is missing or not functioning correctly for the current user." -ForegroundColor $ColorWarning
+        Write-ColoredHost "Could not check or uninstall module '$moduleName'. Error: $($_.Exception.Message)" -ForegroundColor $ColorWarning
     }
     Write-Host "" 
 }
 Write-Host ""
- #>
+#>
 
+# --- Cleanup Original Install Log ---
 Write-ColoredHost "[Cleanup This Uninstallation Script's Log (Optional)]" -ForegroundColor $ColorSection
 Write-ColoredHost "The log for this uninstallation session is at: $logFilePath" -ForegroundColor $ColorInfo
 Write-ColoredHost "This script does not automatically delete its own log file upon completion." -ForegroundColor $ColorInfo
-
-$installTimeLogFile = "C:\Temp\OutlookSignatureLog.txt" 
-Write-ColoredHost "If you wish to clean up the main log file at '$installTimeLogFile', do so manually or via a separate process." -ForegroundColor $ColorInfo
+$installTimeLogFile = "C:\Temp\OutlookSignatureLog.txt"
+Write-ColoredHost "If you wish to clean up the main log file at '$installTime_logFile', do so manually." -ForegroundColor $ColorInfo
 Write-ColoredHost "This script will not delete it automatically to preserve records." -ForegroundColor $ColorInfo
 Write-Host ""
 
