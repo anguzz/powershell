@@ -1,3 +1,5 @@
+# possibly depcreated as of 6/17/25 after new graph module release
+
 $groupId = "" 
 $csvData = New-Object System.Collections.Generic.List[Object]
 
