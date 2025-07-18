@@ -101,14 +101,24 @@ try {
         Write-Log -Message "Created new backup folder: $backupFolderFullPath"
     }
 
-    # --- 4. Copy the Bookmarks File ---
-    $destinationFile = Join-Path -Path $backupFolderFullPath -ChildPath "Bookmarks"
-    Write-Log -Message "Copying Chrome Bookmarks to '$destinationFile'..."
-    try {
-        Copy-Item -Path $chromeBookmarksPath -Destination $destinationFile -Force -ErrorAction Stop
-        Write-Log -Message "Successfully copied Bookmarks file."
-    } catch {
-        Throw "Failed to copy Bookmarks file. Error: $($_.Exception.Message)"
+    # --- 4. Copy the Bookmarks Files ---
+   $filesToBackup = @("Bookmarks", "Bookmarks.bak")
+
+    foreach ($file in $filesToBackup) {
+    $sourceFile = Join-Path -Path $userProfilePath -ChildPath "AppData\Local\Google\Chrome\User Data\Default\$file"
+    $destinationFile = Join-Path -Path $backupFolderFullPath -ChildPath $file
+
+    if (Test-Path -Path $sourceFile -PathType Leaf) {
+        Write-Log -Message "Copying $file to '$destinationFile'..."
+        try {
+            Copy-Item -Path $sourceFile -Destination $destinationFile -Force -ErrorAction Stop
+            Write-Log -Message "Successfully copied $file."
+        } catch {
+            Throw "Failed to copy $file. Error: $($_.Exception.Message)"
+        }
+    } else {
+        Write-Log -Message "Skipping $file. File not found at expected path: $sourceFile"
+    }
     }
 
     # --- 5. Clean Up Old Backups ---
