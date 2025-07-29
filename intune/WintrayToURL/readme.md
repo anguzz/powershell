@@ -85,7 +85,8 @@ Bundle this folder using `.intunewin` on `install.ps1` using the **Win32 Content
 #### install commands 
 - `powershell -ex bypass -file install.ps1`  General install command
 
-#### Testing
-- Tested local install 7/29/25 as user/admin working as intended
-- Tested local install via system account with psexec working as intended. 
-- Testing intune deployment 
+#### Testing 7/29/25
+- Local install tested as both standard user and admin — working as intended
+- Local install tested via SYSTEM context using PsExec — working as intended
+- Intune deployment successful — app installs and scheduled task created as expected 
+  -  Initial launch does not occur immediately for intune deployment, post-install; requires user sign-out/sign-in for scheduled task to trigger
