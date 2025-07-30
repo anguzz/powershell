@@ -90,3 +90,6 @@ Bundle this folder using `.intunewin` on `install.ps1` using the **Win32 Content
 - Local install tested via SYSTEM context using PsExec — working as intended
 - Intune deployment successful — app installs and scheduled task created as expected 
   -  Initial launch does not occur immediately for intune deployment, post-install; requires user sign-out/sign-in for scheduled task to trigger
+ 
+## Example
+<img width="347" height="177" alt="image" src="https://github.com/user-attachments/assets/cabb97ad-258f-45c0-bcdc-095bd9ee8da9" />
