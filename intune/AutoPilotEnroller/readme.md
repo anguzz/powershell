@@ -9,6 +9,13 @@ This PowerShell script provides a simple interface for enrolling devices into Wi
 
 Currently, when a new device during the out-of-box experience (OOBE) needs to be enrolled in Autopilot, a desktop support technician manually intervenes by using a shell (accessible via Shift+Fn+F10) to execute PowerShell commands or run a script. The script, generates a CSV hash file which then must be manually copied onto a USB drive by the technician. This hash file then has to be uploaded to intune 
 
+```powershell
+Install-PackageProvider -Name NuGet -Confirm:$false -Force
+Install-Script -Name Get-WindowsAutoPilotInfo -Confirm:$false -Force
+Set-ExecutionPolicy Bypass -Scope Process -Force
+Get-WindowsAutoPilotInfo.ps1 -Output 'C:\hash.csv'
+```
+
 To simplify this process, we aim to automate the generation of the CSV file and its transfer to and from the USB drive. The script enhances the operational efficiency by reducing manual intervention and minimizing the risk of human error.
 
 Alteneratively, if run by an Administrator with the correct Entra RBAC, the device can be rolled during this script. 
@@ -69,3 +76,7 @@ Sources:
 - `https://www.reddit.com/r/Intune/comments/147sjbx/comment/jnwrceh/`
 
 - `https://learn.microsoft.com/en-us/entra/identity-platform/application-consent-experience`
+- 
+
+
+
