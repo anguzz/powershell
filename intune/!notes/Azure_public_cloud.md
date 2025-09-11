@@ -133,6 +133,46 @@ Each service tag is defined in a block with consistent fields:
 * Existing Intune endpoint rules would be left in place.
 * SSL inspection would be bypassed for `*.manage.microsoft.com` and `*.dm.microsoft.com`.
 
+### Architecture diagram
+
+```
+                          ┌───────────────────────────┐
+                          │     Intune Service        │
+                          │  (*.manage.microsoft.com) │
+                          │  (*.dm.microsoft.com)     │
+                          └──────────────┬────────────┘
+                                         │
+                                         │
+                          ┌──────────────▼──────────────┐
+                          │  Azure Front Door (AFD)     │
+                          │  Service Tag:               │
+                          │  AzureFrontDoor.Microsoft.S │  
+                          │  - Global Edge Nodes        │
+                          │  - Backed by many IP ranges │
+                          └──────────────┬──────────────┘
+                                         │
+                                         │  DNS Resolution
+                                         ▼
+                            ┌─────────────────────┐
+                            │   Public IP Prefixes │
+                            │ (JSON weekly export) │
+                            └─────────────────────┘
+                                         │
+                                         ▼
+────────────────────────────────────────────────────────────
+                 Corporate Firewall / Security Edge
+────────────────────────────────────────────────────────────
+      │
+      │  Outbound TCP 443
+      ▼
+┌───────────────┐
+│   Endpoints   │
+│ (User Device) │
+└───────────────┘
+```
+
+
+
 
 ## Notes
 
