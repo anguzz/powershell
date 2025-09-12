@@ -35,7 +35,7 @@ Storage Account (like a drive)
   * Properties, networking, security, file services
   * Enable static website hosting
   * Add **CDN profiles** and **custom domains**
-  * Enable **Azure Defender** (threat protection, malware scanning \~\$0.15/scan)
+  * Enable **Azure Defender** (threat protection, malware scanning \~\$0.15/scanning per GB)
   * Create **private endpoints**
   * Configure **data protection** (soft delete, retention, snapshots)
 
