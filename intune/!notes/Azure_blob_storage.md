@@ -54,6 +54,28 @@ A bunch of stuff in the portal I noticed poking around.
 * **Anonymous/public access** possible → disabled by default and not recommended (risk of breaches)
 
 
+
+
+## Storage Explorer Application (Windows)
+
+* **Azurite**: In the application you can create an Azure Storage emulator (now known as **Azurite**) to create containers, blobs, queues, and tables locally, and test apps/scripts without touching production.
+* **Resource types**: You can manage a whole **storage account** or an **individual blob container**, as well as queues, individual file shares, tables, etc.
+* **Best practice for connecting**:
+
+  * Use **Subscription (Azure AD login)** whenever possible.
+  * This avoids handling **account keys** or **SAS tokens**, and instead uses your Azure AD identity with RBAC roles (e.g., Blob Contributor).
+  * Benefits: No secrets to manage, least-privilege access, role-based updates apply automatically, and all actions are logged under your user for auditing.
+* **When to use keys/SAS**:
+
+  * For service accounts, pipelines, or when you need to grant temporary access outside your tenant.
+  * Keys = full account access (avoid sharing).
+  * SAS = scoped access (container/file-level, limited time).
+
+
+
+------
+Some interesting features on the portal.
+
 ## Encryption
 
 * **Server-side encryption** is **always on** (cannot be disabled)
@@ -62,6 +84,9 @@ A bunch of stuff in the portal I noticed poking around.
   * **Microsoft-managed keys** (default, rotated by MS)
   * **Customer-managed keys (CMK)** → stored in Azure Key Vault, you manage rotation
   * **Customer-provided keys (CPK)** → supplied by client per request, you manage externally
+
+
+
 
 
 ## Front Door & CDN
