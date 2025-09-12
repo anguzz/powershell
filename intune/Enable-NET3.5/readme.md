@@ -17,3 +17,19 @@ The [`dotNetFx35setup.exe](https://www.microsoft.com/en-us/download/details.aspx
 
 # Install commands
 -  powershell.exe -Mode Install
+
+
+# Get status command
+
+```powershell
+PS C:\Windows\System32> Get-WindowsOptionalFeature -Online -FeatureName "NetFx3"
+
+
+FeatureName      : NetFx3
+DisplayName      : .NET Framework 3.5 (includes .NET 2.0 and 3.0)
+Description      : .NET Framework 3.5 (includes .NET 2.0 and 3.0)
+RestartRequired  : Possible
+State            : Enabled
+CustomProperties :
+                   \FWLink : http://go.microsoft.com/fwlink/?LinkId=296822
+```
