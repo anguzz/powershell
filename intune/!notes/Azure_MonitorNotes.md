@@ -84,3 +84,80 @@ I personally setup dashboards for my use case since since I just want basic info
 6) Hit run
 7) Save as function to seee the code block, copy paste it and export it for re-use
 *optionally, Pin to a custom dashboard*
+
+
+
+#  VM Uptime Alert example
+Overview/notes on setting up Azure alerts 
+
+This can be done under the `Monitor | Alerts` tab in the [Azure Portal](https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/~/alertsV2).
+
+## Overview
+
+| Concept | Purpose | Example |
+| -------- | -------- | -------- |
+| **Alert Rule** | Watches for a metric condition | “If uptime > 30 days, trigger alert.” |
+| **Scope** | Defines monitored resources | “All VMs in rg-vms, etc .” |
+| **Action Group** | Defines who gets notified | “Email sysadmins + SMS on-call.” |
+
+---
+
+## Setup Steps
+
+### 1. Create Action Group
+Defines *who* and *how* to notify.
+
+- Add emails, SMS, webhooks, or Teams connectors  
+- Reuse across alerts (e.g., `ag-system-alerts`, `ag-network-alerts` etc)
+
+---
+
+### 2. Create Alert Rule
+
+
+Defines *what* condition triggers.
+
+- **Metric:** `system/uptime`
+- **Operator:** Greater than  
+- **Threshold:** `2592000` (30 days)  
+- **Frequency:** 1 min  
+- **Lookback:** 5 min  
+- **Severity:** Can choose from 1-5 here  
+- **Action group:** `ag-sysadmin-alerts`
+
+> *Uptime uses seconds (Prometheus/OpenTelemetry standard).*
+
+---
+
+### 3. Set Scope
+
+- **Add VM**  - Add a VM 
+- **Resource Group** – or add RG of vms
+- **Subscription** – Choose subscription
+
+---
+
+### 4. Save & Deploy
+
+- Review → Create  
+- Azure Monitor starts evaluating immediately  
+- Alert fires once uptime crosses 30 days
+
+---
+
+### 5. Receive Alerts
+
+- Email/SMS/Webhook sent  
+- Links to Azure Monitor  
+- Auto-resolves when cleared  
+
+---
+
+## Optional Use Cases
+
+| Scenario | Example |
+| -------- | -------- |
+| Detect reboot | `system/uptime < 300` |
+| Detect agent offline | KQL: `Heartbeat` table |
+| Detect VM stopped | Activity log: `Power Off Virtual Machine` |
+| Escalate alerts | Add webhooks |
