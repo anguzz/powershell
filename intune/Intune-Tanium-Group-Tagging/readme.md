@@ -73,6 +73,19 @@ To add more groups, simply **duplicate the script and update `$tagName`**.
 
 ---
 
+## Intune deployment
+Ensure this is deployed in 64 bit powershell if you want it go to `HKEY_LOCAL_MACHINE\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags`
+otherwise it will install to the WOW6432Node at `HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags`
+
+- install command
+
+`%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
+
+- uninstall command
+
+`%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\uninstall.ps1`
+
+
 # **Tanium Query Usage**
 
 Valid queries for reading tags in Tanium:
