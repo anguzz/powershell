@@ -1,19 +1,22 @@
-$tagPath = "HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\" # this tag localtion is used on single endpoint view in the tanium console, it will appear in the UI under Tags section for the endpoint.
-$tagName = "Tag-name-here" # add reg value for site here.
+$tagPath = "HKLM:\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags"
+$tagName = "tag-name-here"
 
+# Build Tanium-style timestamp value
+$timestamp = "Added: $(Get-Date -Format 'M/d/yyyy h:mm:ss tt')"
 
-# Ensure the Tags key exists
+# Ensure the Tag directory exists
 if (-not (Test-Path $tagPath)) {
     New-Item -Path $tagPath -Force | Out-Null
 }
-# Create the tag
+
+# Create or update the registry value
 try {
-    New-ItemProperty -Path $tagPath -Name $tagName -PropertyType String -Value "True" -Force | Out-Null
-    Write-Output "Tag '$tagName' created successfully."
+    New-ItemProperty -Path $tagPath -Name $tagName -PropertyType String -Value $timestamp -Force | Out-Null
+    Write-Output "Tag '$tagName' created with timestamp '$timestamp'."
 }
 catch {
     Write-Output "Error creating tag '$tagName' : $_"
-}   
+}
+
 Write-Output "Tanium tag script completed."
-# End of script
 exit 0

@@ -1,5 +1,5 @@
-$tagPath = "HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\"
-$tagName = "Tag-name-here" # add reg value for site here.
+$tagPath = "HKLM:\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags" # this tag localtion is used on single endpoint view in the tanium console, it will appear in the UI under Tags section for the endpoint.
+$tagName = "tag-name-here" # add reg value for site here.
 
 # If key doesn’t exist, nothing to remove
 if (-not (Test-Path $tagPath)) {

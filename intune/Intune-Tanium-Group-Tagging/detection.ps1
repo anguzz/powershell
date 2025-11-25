@@ -1,31 +1,28 @@
-# for a remediation detection simply change the whole script to exit 1; to force the tag to be applied
+# Run script as 32-bit process on 64-bit clients: Yes
 
-$tagPath = "HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\"
-$tagName = "Tag-name-here" # add reg value for site here.
+$tagPath = "HKLM:\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags"
+$tagName = "Tag-name-here"
 
-# Check if path exists
+# Check if parent key exists
 if (-not (Test-Path $tagPath)) {
-    # Tag store missing > app not installed
+    Write-Output "Tag path missing. Not installed."
     exit 1
 }
 
-# Get the value if present
 try {
-    $value = Get-ItemProperty -Path $tagPath -Name $tagName -ErrorAction Stop
+    # Try to read the value
+    $value = (Get-ItemProperty -Path $tagPath -Name $tagName -ErrorAction Stop).$tagName
 
-    if ($value.$tagName -eq "True") {
-        # Tag exists > app is installed
-        Write-Output "Tag '$tagName' found. Application is installed."
+    if ($value -match "^Added:") {
+        Write-Output "Tag '$tagName' found with timestamp '$value'. Installed."
         exit 0
-        
     }
     else {
-        Write-output "Tag '$tagName' not found. Application is not installed."
+        Write-Output "Tag '$tagName' value not in expected format. Not installed."
         exit 1
     }
 }
 catch {
-    # Value missing > not installed
-    Write-output "Tag '$tagName' not found. Application is not installed."
+    Write-Output "Tag '$tagName' not found. Not installed."
     exit 1
 }

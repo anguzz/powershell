@@ -24,10 +24,10 @@ Assumes:
 * A **corresponding registry tag name** is mapped to that group
 * An **Intune remediation or Win32 deployment** is targeted to that user group
 
-When a user in that group signs into a device, the script runs as **SYSTEM** and writes:
+When a user in that group signs into a device, the script runs as **SYSTEM** and writes to:
 
 ```
-HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\<TagName>
+HKLM:\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags\<TagName>
 ```
 
 Tanium sensors then use this value for targeting, filtering, deployments, and reporting.
@@ -36,85 +36,80 @@ Tanium sensors then use this value for targeting, filtering, deployments, and re
 
 ## **How the Tagging Flow Works**
 
-1. **Create an Entra group** that represents the user group
-2. **Assign users** to that group
-3. **Clone the remediation/Win32 script** and update `$tagName`
-4. **Assign the script** to the corresponding Entra user group
-5. Upon sign-in, Intune runs the script as SYSTEM and writes the registry tag
+1. Create an Entra group
+2. Add users to that group
+3. Duplicate the remediation/Win32 script & set `$tagName`
+4. Assign the script to the matching Entra user group
+5. Script runs as SYSTEM → writes tag to WOW6432Node
 
-This creates a stable and predictable relationship between:
+This creates a stable relationship between:
 
-* User group membership
-* The device the user authenticates on
-* The tags Tanium detects
-* How endpoints get categorized
+* User identity → Device → Registry tag → Tanium classification
 
 ---
 
 ## **Script Behavior**
 
-The script:
+The script performs the following:
 
-* Ensures the tag path exists:
+* Ensures the WOW6432Node path exists:
 
-  ```
-  HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\
-  ```
+```
+HKLM:\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags\
+```
 
 * Creates a registry value named after the group’s tag
+* Writes a timestamp using value using powershell as a string (REG_SZ)
+* Is **safe to run repeatedly (idempotent)**
+* Works when targeted to **user groups**, since execution is under SYSTEM
 
-* Writes `"True"` (REG_SZ)
-
-* Is **idempotent** — safe to run repeatedly
-
-* Can be targeted to **user groups** because execution occurs under SYSTEM
-
-To add more groups, simply **duplicate the script and update `$tagName`**.
+To add new groups, just **clone the script and change `$tagName`**.
 
 ---
 
-## Intune deployment
-Ensure this is deployed in 64 bit powershell if you want it go to `HKEY_LOCAL_MACHINE\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags`
-otherwise it will install to the WOW6432Node at `HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags`
+# **Intune Deployment**
 
-- install command
+Since Tanium runs as a **32-bit service**, you MUST target the 32-bit registry hive.
+To do this reliably in Intune, always run the script with **SysNative path** to force 64-bit PowerShell into 32-bit registry redirection.
 
-`%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\install.ps1`
+Other tanium tags that get created through tanium also install to this hive.
 
-- uninstall command
 
-`%windir%\SysNative\WindowsPowershell\v1.0\PowerShell.exe -NoProfile -ExecutionPolicy ByPass -File .\uninstall.ps1`
+### **Install Command**
 
+```
+powershell -ex bypass -file install.ps1
+
+```
+
+### **Uninstall Command**
+
+```
+powershell -ex bypass -file uninstall.ps1
+```
+
+### **Registry Location Used**
+
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags
+```
+
+---
 
 # **Tanium Query Usage**
 
-Valid queries for reading tags in Tanium:
+
+- `Get Computer Name from all entities with Registry Key Value Exists[HKLM\SOFTWARE\Tanium\Tags,<tag-name>] equals True` gives you a listing of all machine names with the tag in single list
+
+
+- `Get Registry Key Value Exists[HKLM\SOFTWARE\Tanium\Tags,<tag-name>] from all entities with Is Windows equals True` shows all true and false machines with tag
 
 ---
 
-### **Check if a specific tag exists**
+### **Return everything under WOW6432Node Tanium**
 
-```shell
-Get Registry Key Value Exists[HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\<TagName>] 
-from all entities with Is Windows equals True
 ```
-
----
-
-### **Return computers with a given tag**
-
-```shell
-Get Computer Name 
-from all entities 
-with Registry Key Value Exists[HKLM:\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\, <TagName>] equals True
-```
-
----
-
-### **Return everything under HKLM:\SOFTWARE\Tanium**
-
-```shell
-Get Registry Key Subkeys[HKLM\SOFTWARE\Tanium]
+Get Registry Key Subkeys[HKLM\SOFTWARE\WOW6432Node\Tanium]
 ```
 
 ---
@@ -124,22 +119,24 @@ Get Registry Key Subkeys[HKLM\SOFTWARE\Tanium]
 Tanium KB:
 [https://help.tanium.com/bundle/z-kb-articles-salesforce/page/kA00e000000TbgbCAC.html](https://help.tanium.com/bundle/z-kb-articles-salesforce/page/kA00e000000TbgbCAC.html)
 
+Enhanced tagging:
+[https://help.tanium.com/bundle/EnhTagsDoc/page/KA/EnhTagsDoc/EnhTagsDoc.htm](https://help.tanium.com/bundle/EnhTagsDoc/page/KA/EnhTagsDoc/EnhTagsDoc.htm)
+
 ---
 
 ## **Notes**
 
-* **Do not target multiple tagging scripts to the same user group.**
-* If a user belongs to multiple groups, **multiple tags will be written** (expected behavior).
-* Script must run as **SYSTEM** to write to HKLM.
-* Tanium sensors can fully classify devices based on these tags.
-* Tags are **additive**, not mutually exclusive.
-* Devices keep tags until explicitly removed via an uninstall/cleanup script.
+* Do **not** target multiple tagging scripts to the same user group
+* If a user belongs to multiple groups, **multiple tags will be written**
+* Script must run as **SYSTEM**
+* Tags persist until removed by a cleanup script
+* Tags are additive and safe for dynamic grouping
 
 ---
 
-# **Tagging Flow Diagram (With Platform Labels)**
+# **Tagging Flow Diagram (Updated to WOW6432Node)**
 
-```shell
+```
 +--------------------+
 |     Entra ID       |
 +--------------------+
@@ -169,10 +166,10 @@ Tanium KB:
 +--------------------+
           │
           ▼
-+--------------------------------------------------------------+
-| Script runs as SYSTEM and writes registry tag:               |
-| HKLM\SOFTWARE\Tanium\Tanium Client\Sensor Data\Tags\<Tag>    |
-+--------------------------------------------------------------+
++--------------------------------------------------------------------------+
+| Script runs as SYSTEM and writes registry tag:                           |
+| HKLM\SOFTWARE\WOW6432Node\Tanium\Tanium Client\Sensor Data\Tags\<Tag>    |
++--------------------------------------------------------------------------+
 
           │
           ▼
@@ -182,8 +179,8 @@ Tanium KB:
 +--------------------+
           │
           ▼
-+--------------------------------------------------------------+
-| Sensors detect tag → dynamic grouping, reporting, targeting  |
-+--------------------------------------------------------------+
++--------------------------------------------------------------------------+
+| Sensors detect tag → dynamic grouping, reporting, targeting              |
++--------------------------------------------------------------------------+
 ```
 
