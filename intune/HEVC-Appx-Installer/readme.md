@@ -5,6 +5,7 @@ Microsoft provides a free HEIF Image Extension that enables Windows to read/writ
 - Link: https://apps.microsoft.com/detail/9pmmsr1cgpwg?hl=en-US&gl=US#activetab=pivot:overviewtab
 
 However, the HEVC codec required for `.H265` / `.HEVC` video playback is a **paid Microsoft product**.
+<img width="687" height="352" alt="image" src="https://github.com/user-attachments/assets/cdcce67b-0cda-40bd-a64a-ee515008d345" />
 
 For testing and research, it is possible to obtain the publicly listed **HEVC Video Extensions** `.appxbundle` using the following:
 
