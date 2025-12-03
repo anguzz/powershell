@@ -43,3 +43,15 @@ Two uninstall scripts are provided
 
 - `powershell -ex bypass -file uninstall.ps1`  Run the uninstaller
 
+
+```
+AppDeployment/
+│
+├── Files/
+│   └── <ApplicationInstaller>.exe | <ApplicationInstaller>.msi 
+│
+├── install_exe.ps1    | install_msi.ps1
+├── uninstall_exe.ps1 | uninstall_msi.ps1
+├── detection.ps1
+└── README.md
+```
