@@ -296,3 +296,25 @@ mutation AddTag($id: String!, $tag: String!) {
 
 
 
+# More queries
+
+Using this to discover all types and better visualize the data i can reach.
+```
+query findAllTypes {
+  __schema {
+    types {
+      name
+      kind
+      fields {
+        name
+        type {
+          name
+          kind
+        }
+      }
+    }
+  }
+}
+```
+
+This discovers all the types in taniums graphQL. 
