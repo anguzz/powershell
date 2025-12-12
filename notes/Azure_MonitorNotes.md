@@ -161,3 +161,39 @@ Defines *what* condition triggers.
 | Detect agent offline | KQL: `Heartbeat` table |
 | Detect VM stopped | Activity log: `Power Off Virtual Machine` |
 | Escalate alerts | Add webhooks |
+
+
+---
+
+## Azure Alerts & Suppression (High Level)
+
+1. **Create an Action Group**
+   Defines who receives notifications (email, SMS, webhook, chat).
+
+2. **Create an Alert Rule**
+   Defines what triggers the alert (metric, threshold, frequency) and which action group is used.
+
+3. **Set Scope**
+   Apply the alert to VMs, a resource group, or a subscription.
+
+4. **Alert Fires**
+   When the condition is met, Azure Monitor triggers the alert and sends notifications.
+
+---
+
+## Alert Suppression (Maintenance Windows)
+
+To avoid alert noise during planned maintenance, **alert processing rules** are used.
+
+`Azure> monitor > alerts > Create alert processing rule > create`
+
+* Scope the suppression rule to the same resource group as the monitored VMs
+* Set the rule to **suppress notifications** (alerts still evaluate and log)
+* Apply a recurring schedule that matches the maintenance window
+
+**Expected Result**
+
+* Alerts still fire during maintenance
+* Notifications are muted
+* Normal alerting resumes automatically after the window
+
