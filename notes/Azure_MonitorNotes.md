@@ -181,19 +181,142 @@ Defines *what* condition triggers.
 
 ---
 
-## Alert Suppression (Maintenance Windows)
 
-To avoid alert noise during planned maintenance, **alert processing rules** are used.
+# Azure Monitor – Tiered VM Availability Alerts with Maintenance Suppression
 
-`Azure> monitor > alerts > Create alert processing rule > create`
+## 1. Overview
+This design reduces **alert fatigue during scheduled maintenance** while ensuring prolonged VM outages are **never missed**.  
+It uses two availability alerts with different evaluation windows and a **targeted alert processing (suppression) rule** that silences only expected reboot noise.
 
-* Scope the suppression rule to the same resource group as the monitored VMs
-* Set the rule to **suppress notifications** (alerts still evaluate and log)
-* Apply a recurring schedule that matches the maintenance window
+---
 
-**Expected Result**
+## 2. Alert Rules
 
-* Alerts still fire during maintenance
-* Notifications are muted
-* Normal alerting resumes automatically after the window
+### Alert Rule A: VM Availability – Short Duration
+
+**Purpose:**  
+Detects short VM outages (e.g., reboots during patching). These alerts are expected during maintenance and are suppressed.
+
+#### Configuration
+| Setting | Value |
+|------|------|
+| **Signal** | `VmAvailabilityMetric` |
+| **Operator** | Less than |
+| **Aggregation type** | Average |
+| **Threshold** | `< 1` |
+| **Lookback period** | 5 minutes |
+| **Evaluation frequency** | 1 minute |
+| **Severity** | Informational |
+| **Auto-resolve** | Enabled |
+
+#### Behavior
+- Triggers quickly when a VM becomes unavailable
+- Intended to catch platform-level outages or deallocations
+- Suppressed during maintenance windows to avoid noise
+
+---
+
+### Alert Rule B: VM Availability – Prolonged Outage
+
+**Purpose:**  
+Acts as a safety net to catch VMs that fail to recover after maintenance.
+
+#### Configuration
+| Setting | Value |
+|------|------|
+| **Signal** | `VmAvailabilityMetric` |
+| **Operator** | Less than |
+| **Aggregation type** | Average |
+| **Threshold** | `= 0` |
+| **Lookback period** | 1 hour |
+| **Evaluation frequency** | 5 minutes |
+| **Severity** | Error |
+| **Auto-resolve** | Enabled |
+
+#### Behavior
+- Fires only if a VM remains unavailable for **60 continuous minutes**
+- Bypasses maintenance suppression
+- Designed to catch stuck patching, failed boots, or hung systems
+
+---
+
+## 3. Maintenance Suppression Rule
+
+### Scheduled Maintenance – Alert Suppression
+
+**Purpose:**  
+Suppress notifications only for short-duration availability alerts during known maintenance windows.
+
+#### Scope
+- Subscription-level or resource-group–level scope
+- Targets infrastructure virtual machines
+
+#### Rule Type
+- **Suppress notifications**
+
+#### Schedule
+| Setting | Value |
+|------|------|
+| **Recurrence** | Weekly |
+| **Days** | Saturday → Sunday |
+| **Start Time** | 7:00 PM (Local / PST) |
+| **End Time** | 2:00 AM (Next day) |
+| **Timezone** | Local maintenance timezone |
+
+#### Filter Configuration
+| Setting | Value |
+|------|------|
+| **Filter type** | Alert rule name |
+| **Operator** | Equals |
+| **Value** | VM Availability – Short Duration |
+
+#### Result
+- Only short-duration availability alerts are suppressed
+- Long-duration outage alerts remain active and notify immediately
+- Prevents maintenance from masking real failures
+
+---
+
+## 4. Notification & Routing
+
+### Central Action Group
+
+All alert rules route through a single centralized notification mechanism.
+
+#### Configuration
+| Setting | Value |
+|------|------|
+| **Delivery methods** | Email |
+| **Targets** | Operations distribution list, ticketing system |
+| **Region** | Global |
+
+#### Alert Flow
+| Alert Type | During Maintenance | Outside Maintenance |
+|---------|------------------|------------------|
+| Short Duration | Suppressed | Notifies |
+| Prolonged Outage | Not Suppressed | Notifies |
+
+#### Extensibility
+- SMS, push notifications, or on-call escalation can be added for prolonged outage alerts
+- Different action groups can be attached per severity if needed
+
+---
+
+## 5. Design Benefits
+
+- Eliminates noisy reboot alerts during patching
+- Guarantees visibility into failed or stuck VMs
+- Uses **simple naming-based filtering** (no complex logic or tags)
+- Scales cleanly across environments and teams
+- Easy to audit and explain during incidents or reviews
+
+---
+
+## 6. Summary
+
+This configuration intentionally separates:
+- **Detection speed** (short-duration alerts)
+- **Operational significance** (long-duration alerts)
+
+By combining tiered alerts with targeted suppression, it provides a reliable, low-noise monitoring strategy suitable for production environments.
 
