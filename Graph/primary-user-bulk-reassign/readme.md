@@ -51,3 +51,10 @@ It uses the following endpoint:
 
 # Preview actions without making changes
 .\reassign.ps1 -StagingUserUpn "user@email.com" -WhatIf
+```
+
+## reassign-null.ps1
+This script will reassign any device that has a null primary user to the last logged in device. The script supports the -WhatIf flag.
+
+
+
