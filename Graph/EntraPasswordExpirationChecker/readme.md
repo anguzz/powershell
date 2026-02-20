@@ -112,3 +112,10 @@ Recommended flags:
   * Certificate-based authentication
   * App registration instead of interactive login
   * Code signing the executable
+
+## Demo
+<img width="504" height="208" alt="image" src="https://github.com/user-attachments/assets/06f83fa5-d173-4689-b878-cd83c98fcbe0" />
+
+<img width="880" height="178" alt="image" src="https://github.com/user-attachments/assets/d9ecbbb6-6235-4e63-83f5-535b55260bcf" />
+
+
