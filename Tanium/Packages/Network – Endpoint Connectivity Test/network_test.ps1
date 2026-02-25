@@ -1,14 +1,19 @@
-param(
-    [string]$destinationIP
-)
+# Get argument from Tanium
+$destinationIP = $args[0]
 
-# Decode UTF-8 encoded parameter (required in Tanium Cloud)
-$destinationIP = [System.Uri]::UnescapeDataString($destinationIP)
+# Decode URL-encoded input
+if ($destinationIP) {
+    $destinationIP = [System.Uri]::UnescapeDataString($destinationIP)
+}
 
 if ([string]::IsNullOrWhiteSpace($destinationIP)) {
     Write-Output "ERROR: No destination IP provided."
     exit 1
 }
+
+Write-Output "=== Network Test Report ==="
+Write-Output "Target: $destinationIP"
+Write-Output "Timestamp: $(Get-Date)"
 
 Write-Output "=== Network Test Report ==="
 Write-Output "Target: $destinationIP"
