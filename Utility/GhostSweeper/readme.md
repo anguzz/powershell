@@ -108,7 +108,21 @@ To ensure the script can see "Cloaked" files in system directories:
 
 ---
 
+
+
+## References & Inspiration
+- https://github.com/AssoEchap/stalkerware-indicators
+
+
+## Next Steps
+- Incorporate relevant stalkerware/watchware indicators from the AssoEchap IOC repository and expand GhostSweeper’s Windows focused signature set.
+- Review additional public IOC and security research repositories to further enrich process, service, path, certificate, and network indicator coverage.
+- Expand detection coverage to include scheduled tasks, WMI persistence, startup folders, and network indicators (DNS/cache/hosts).
+
+
 ## Security and Ethical Notice
 
 This tool is for **transparency and auditing**. Users are encouraged to use this script to understand what is running on their hardware. Be aware that disabling or tampering with monitoring software on company-owned assets may lead to disciplinary action.
+
+
 
