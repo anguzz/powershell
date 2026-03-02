@@ -4,6 +4,10 @@
 
 GhostSweeper is a custom PowerShell-based privacy auditor designed to detect both "visible" productivity trackers and "invisible" stealth or ghost monitoring agents on Windows systems. Unlike basic inventory scripts, it specifically hunts for cloaked processes and obfuscated directory structures used by modern 2026-era monitoring solutions.
 
+
+## Example
+<img width="800" height="398" alt="image" src="https://github.com/user-attachments/assets/e76c7a09-9715-4d5a-beec-91378ef8db7e" />
+
 ---
 
 ## Features
