@@ -1,0 +1,49 @@
+﻿2026-02-06 09:21:01, Error                 CONX   Appraiser: ERROR,SdbpGetMatchingInfoBlocksInternal,2313,TAGREF array insufficient
+
+2026-02-06 09:21:02, Error                 CONX   Appraiser: ERROR,SdbpGetMatchingInfoBlocksInternal,2313,TAGREF array insufficient
+
+2026-02-06 09:21:04, Error                 CONX   Appraiser: ERROR,SdbpGetMatchingInfoBlocksInternal,2313,TAGREF array insufficient
+
+2026-02-06 09:32:13, Error      [0x080831] MIG        CSIAgent: Invalid xml format: FormatException: "script" attribute is mandatory. class Mig::CMXEMerge *__cdecl Mig::CMXEMigrationXml::LoadMerge(class UnBCL::XmlNode *,int,class Mig::CMXEMigrationXml *,class Mig::CMXEXmlComponent *)
+2026-02-06 09:39:35, Error      [0x0808fe] MIG    Plugin {ff9c714f-b864-4f43-ae39-ec07d7385abe}: Unable to determine inbox status of driver 'oem181.---' for 'ROOT\SYSTEM\0002'. Error = 0x00000002
+2026-02-06 09:39:36, Error      [0x0808fe] MIG    Plugin {ff9c714f-b864-4f43-ae39-ec07d7385abe}: BthMigLib: BthMig(V:2 T:1): This device is not a personal device, will check to see if authenticated
+2026-02-06 09:39:36, Error      [0x0808fe] MIG    Plugin {ff9c714f-b864-4f43-ae39-ec07d7385abe}: BthMigLib: BthMig(V:2 T:1): This device is not a personal device, will check to see if authenticated
+2026-02-06 09:39:36, Error      [0x0808fe] MIG    Plugin {ff9c714f-b864-4f43-ae39-ec07d7385abe}: BthMigLib: BthMig(V:2 T:1): This device is not a personal device, will check to see if authenticated
+2026-02-06 09:39:36, Error      [0x0808fe] MIG    Plugin {ff9c714f-b864-4f43-ae39-ec07d7385abe}: BthMigLib: BthMig(V:2 T:1): This device is not a personal device, will check to see if authenticated
+2026-02-06 09:39:36, Error      [0x0808fe] MIG    Plugin {ff9c714f-b864-4f43-ae39-ec07d7385abe}: BthMigLib: BthMig(V:2 T:1): This device is not a personal device, will check to see if authenticated
+2026-02-06 10:21:01, Error      [0x0808fe] MIG    Plugin {0b23c863-4410-4153-8733-a60c9b1990fb}: TableTextServiceMig!RemoveObsoleteCHSHKLMRegkey - fail to open regkey (software\Microsoft\CTF\TIP\{E429B25A-E5D3-4D1F-9BE3-0C608477E3A1}\LanguageProfile\0x00000804) = 2
+2026-02-06 10:21:01, Error      [0x0808fe] MIG    Plugin {0b23c863-4410-4153-8733-a60c9b1990fb}: TableTextServiceMig!ApplySuccess() remove HKLM Registries error
+2026-02-06 10:21:02, Error      [0x0808fe] MIG    Plugin {ee036dc0-f9b7-4d2d-bb94-3dd3102c5804}: BRIDGEMIG: ParseRegistryIfBridgeExists: offline key (new) = '$OFFLINE_RW_810A4DCA$SYSTEM\Setup\Upgrade\Bridge'
+2026-02-06 10:21:02, Error      [0x0808fe] MIG    Plugin {ee036dc0-f9b7-4d2d-bb94-3dd3102c5804}: BRIDGEMIG: ParseRegistryIfBridgeExists: query bridge presence key failed 0x139f, bridge present = 0
+2026-02-06 10:21:03, Error      [0x08038d] MIG            Failure while calling IPostApply->ApplySuccess for Plugin={ServerPath="Microsoft-Windows-DirectoryServices-ADAM-Client\adammigrate.dll", CLSID={43CCF250-2A74-48c6-9620-FC312EC475D6}, ThreadingModel=Apartment, ExceptionHandling=Default}. Error: 0x80070002
+2026-02-06 10:21:03, Error                 SP             Error READ, 0x00000002 while gathering/applying object: apply-success, Action,CMXEXmlPlugin,C:\$WINDOWS.~BT\Sources\ReplacementManifests,Microsoft-Windows-DirectoryServices-ADAM-Client\adammigrate.dll,{43CCF250-2A74-48c6-9620-FC312EC475D6},Apartment,Default. Will return 2[gle=0x000000cb]
+2026-02-06 10:21:03, Error      [0x0808fe] MIG    Plugin {8707fcd0-e62a-4451-b224-7707ffe1c286}: WinsockMig: Namespace catalog is not equal so integration is required
+
+2026-02-06 10:21:03, Error      [0x0808fe] MIG    Plugin {8707fcd0-e62a-4451-b224-7707ffe1c286}: WinsockMig: Upgrade of NSPs is now disabled when in offline mode
+
+2026-02-06 10:22:20, Error                 MIG            V2VArbitrate: Source migration unit is critical, arbitration will fail[gle=0x000000cb]
+2026-02-06 10:22:20, Error                                V2V Arbitration failed. Last error: 0x00000032[gle=0x00000032]
+2026-02-06 10:22:20, Error                 SP         pSPExecuteApply: Apply operation failed. Error: 0x0000002C
+2026-02-06 10:22:20, Error                 SP         Apply (machine-independent apply, offline phase): Migration phase failed. Result: 44, no specific error
+2026-02-06 10:22:20, Error                 SP     Operation failed: Offline portion of machine-specific and machine-independent apply operations. Error: 0x8007042B[gle=0x000000b7]
+2026-02-06 10:34:49, Error                 SP         BFSVC: AddBootmgrLast and PreserveBootOrder options are ignored when custom volume is specified
+2026-02-10 14:23:43, Error      [0x0808fe] MIG    Plugin {0b23c863-4410-4153-8733-a60c9b1990fb}: TableTextServiceMig!RemoveObsoleteCHSHKLMRegkey - fail to open regkey (software\Microsoft\CTF\TIP\{E429B25A-E5D3-4D1F-9BE3-0C608477E3A1}\LanguageProfile\0x00000804) = 2
+2026-02-10 14:23:43, Error      [0x0808fe] MIG    Plugin {0b23c863-4410-4153-8733-a60c9b1990fb}: TableTextServiceMig!ApplySuccess() remove HKLM Registries error
+2026-02-10 14:23:43, Error      [0x0808fe] MIG    Plugin {ee036dc0-f9b7-4d2d-bb94-3dd3102c5804}: BRIDGEMIG: ParseRegistryIfBridgeExists: offline key (new) = '$OFFLINE_RW_810A4DCA$SYSTEM\Setup\Upgrade\Bridge'
+2026-02-10 14:23:43, Error      [0x0808fe] MIG    Plugin {ee036dc0-f9b7-4d2d-bb94-3dd3102c5804}: BRIDGEMIG: ParseRegistryIfBridgeExists: query bridge presence key failed 0x139f, bridge present = 0
+2026-02-10 14:23:43, Error      [0x08038d] MIG            Failure while calling IPostApply->ApplySuccess for Plugin={ServerPath="Microsoft-Windows-DirectoryServices-ADAM-Client\adammigrate.dll", CLSID={43CCF250-2A74-48c6-9620-FC312EC475D6}, ThreadingModel=Apartment, ExceptionHandling=Default}. Error: 0x80070002
+2026-02-10 14:23:43, Error                 SP             Error READ, 0x00000002 while gathering/applying object: apply-success, Action,CMXEXmlPlugin,C:\$WINDOWS.~BT\Sources\ReplacementManifests,Microsoft-Windows-DirectoryServices-ADAM-Client\adammigrate.dll,{43CCF250-2A74-48c6-9620-FC312EC475D6},Apartment,Default. Will return 2[gle=0x000000cb]
+2026-02-10 14:23:43, Error      [0x0808fe] MIG    Plugin {8707fcd0-e62a-4451-b224-7707ffe1c286}: WinsockMig: Namespace catalog is not equal so integration is required
+
+2026-02-10 14:23:43, Error      [0x0808fe] MIG    Plugin {8707fcd0-e62a-4451-b224-7707ffe1c286}: WinsockMig: Upgrade of NSPs is now disabled when in offline mode
+
+2026-02-10 14:23:54, Error                 MIG            V2VArbitrate: Source migration unit is critical, arbitration will fail[gle=0x000000cb]
+2026-02-10 14:23:54, Error                                V2V Arbitration failed. Last error: 0x00000032[gle=0x00000032]
+2026-02-10 14:23:54, Error                 SP         pSPExecuteApply: Apply operation failed. Error: 0x0000002C
+2026-02-10 14:23:55, Error                 SP         Apply (machine-independent apply, offline phase): Migration phase failed. Result: 44, no specific error
+2026-02-10 14:23:55, Error                 SP     Operation failed: Offline portion of machine-specific and machine-independent apply operations. Error: 0x8007042B[gle=0x000000b7]
+2026-02-10 14:23:55, Error                 SP     Cannot revert execution of operation 100 (Add boot entry for C:\$WINDOWS.~BT\NewOS\WINDOWS. Locale = en-US). Execution queue is now compromised.[gle=0x00000002]
+2026-02-10 14:23:55, Error                 SP     Operation execution failed: 13. hr = 0x8007042B[gle=0x00000002]
+2026-02-10 14:23:55, Error                 SP     ExecuteOperations: Main operation execution failed. Error: 0x8007042B[gle=0x00000002]
+2026-02-10 14:23:55, Error                 SP     ExecuteOperations: Failed execution phase Safe OS. Error: 0x8007042B[gle=0x00000002]
+2026-02-10 14:23:55, Error                 SP     CSetupPlatformPrivate::Execute: Execution of operations queue failed, abandoning. Error: 0x8007042B[gle=0x00000002]
