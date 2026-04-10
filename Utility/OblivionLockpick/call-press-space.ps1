@@ -1,5 +1,5 @@
 
-$TargetScriptName = "pressSpace.ps1"
+$TargetScriptName = "press-space.ps1"
 $IntervalSeconds = 1
 $DurationMinutes = 1
 

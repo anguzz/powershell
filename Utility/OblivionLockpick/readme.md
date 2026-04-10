@@ -7,7 +7,7 @@ I stumbled upon an exploit exists in Oblivion remastered where rapidly sending '
 
 ## The Problem: Window Focus Instability
 
-An initial attempt involved a simple PowerShell script (`pressSpace.ps1`) running with administrator privileges to send a large number of `[System.Windows.Forms.SendKeys]` commands (e.g., 1000) to the game window.
+An initial attempt involved a simple PowerShell script (`press-space.ps1`) running with administrator privileges to send a large number of `[System.Windows.Forms.SendKeys]` commands (e.g., 1000) to the game window.
 
 **Observation:** Despite running as admin (solving potential UAC/permission issues), only the first ~5-20 `SendKeys` commands registered in-game.
 
@@ -35,7 +35,7 @@ To overcome the focus limitation, a second script (`callPressSpace.ps1`) acts as
 
 **Why this is More Effective:**
 
-* **Admin Rights:** Ensures `pressSpace.ps1` has the necessary permissions to interact with the game window (overcoming UAC/integrity level blocks).
+* **Admin Rights:** Ensures `press-space.ps1` has the necessary permissions to interact with the game window (overcoming UAC/integrity level blocks).
 * **Focus Mitigation:** Executing in *short, repeated bursts* (e.g., 20 clicks per second) drastically reduces the impact of focus loss. Each new instance gets a fresh chance to target the (hopefully) active game window immediately after launch. While focus might still be lost *during* a burst, the frequent restarts make it highly probable that many bursts will execute successfully before focus shifts, providing much greater reliability than one long, vulnerable execution.
 
 ##  Setup
