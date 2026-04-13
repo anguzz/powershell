@@ -34,6 +34,8 @@ In Fate Injector:
 
 **Note:** Ensure **DirectX is actively running** (the game must be fully initialized).
 
+<img width="286" height="154" alt="image" src="https://github.com/user-attachments/assets/94679184-9509-45ce-981a-a4e0c1ff7e93" />
+
 ---
 
 ### Step 5 – Open Menu
@@ -43,6 +45,8 @@ In Fate Injector:
 
   * `Insert` key
   * or `Shift + 0` (alternate Insert binding)
+  * 
+<img width="960" height="507" alt="image" src="https://github.com/user-attachments/assets/fec84415-8411-4382-875d-a45f8da7f59d" />
 
 ---
 
