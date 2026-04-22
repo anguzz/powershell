@@ -49,6 +49,7 @@ To overcome the focus limitation, a second script (`callPressSpace.ps1`) acts as
 3) Run `callPressSpace.ps1` as an admin.
 ![alt text](image.png)
 
-4) Profit ![alt text](20F1D8~1.JPG)
+4) Profit <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3968556d-cce9-4b21-9a9a-251a4da966f1" />
+
 
 - Note: Ensure you sleep every once in a while to claim the levels from leveling lockpicking. 
