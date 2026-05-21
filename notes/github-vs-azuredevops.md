@@ -1,6 +1,3 @@
-Here is a **more objective and corrected version** of your notes, with the onboarding/governance nuance added and bias reduced.
-
----
 
 # GitHub Enterprise vs Azure DevOps
 

@@ -1,6 +1,3 @@
-Here’s your notes rewritten to be **simpler, linear, and easier to scan**, with fewer sections and only `-` bullets, while keeping your diagrams unchanged.
-
-
 # NDES + Intune Certificate Connector – Quick Notes
 
 ## Purpose (what this stack actually does)
