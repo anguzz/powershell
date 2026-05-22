@@ -79,7 +79,7 @@ function Add-Log {
     Write-Log -Level $Level -Message $Message
 }
 
-function Show-AppxLiftMessage {
+function Show-StoreLiftMessage {
     param(
         [Parameter(Mandatory)][string]$Message,
         [Parameter(Mandatory)][string]$Title,
@@ -640,7 +640,7 @@ function Get-SafeFolderName {
 }
 
 
-function Remove-AppxLiftBitsTempFiles {
+function Remove-StoreLiftBitsTempFiles {
     param([Parameter(Mandatory)][string]$FolderPath)
 
     try {
@@ -651,7 +651,7 @@ function Remove-AppxLiftBitsTempFiles {
     catch { }
 }
 
-function Invoke-AppxLiftFileDownload {
+function Invoke-StoreLiftFileDownload {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$Source,
@@ -662,13 +662,13 @@ function Invoke-AppxLiftFileDownload {
     )
 
     $downloadFolder = Split-Path -Parent $Destination
-    Remove-AppxLiftBitsTempFiles -FolderPath $downloadFolder
+    Remove-StoreLiftBitsTempFiles -FolderPath $downloadFolder
 
     if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
         $bitsJob = $null
         try {
             Write-Log -Level Info -Message "Starting BITS download: $FileName"
-            $bitsJob = Start-BitsTransfer -Source $Source -Destination $Destination -Description "AppxLift download: $FileName" -Asynchronous -ErrorAction Stop
+            $bitsJob = Start-BitsTransfer -Source $Source -Destination $Destination -Description "StoreLift download: $FileName" -Asynchronous -ErrorAction Stop
 
             $startTime = Get-Date
             $lastProgressTime = Get-Date
@@ -741,7 +741,7 @@ function Invoke-AppxLiftFileDownload {
                 }
             }
             catch { }
-            Remove-AppxLiftBitsTempFiles -FolderPath $downloadFolder
+            Remove-StoreLiftBitsTempFiles -FolderPath $downloadFolder
         }
     }
 
@@ -805,8 +805,8 @@ function Download-StorePackages {
         try {
             if (-not (Test-Path $targetPath)) {
                 # BITS can leave a BIT*.tmp file while it is actively downloading.
-                # Use async BITS so AppxLift can detect a stalled transfer and fall back cleanly.
-                Invoke-AppxLiftFileDownload -Source $url -Destination $targetPath -FileName $fileName
+                # Use async BITS so StoreLift can detect a stalled transfer and fall back cleanly.
+                Invoke-StoreLiftFileDownload -Source $url -Destination $targetPath -FileName $fileName
             }
             else {
                 Write-Log -Level Info -Message "Already exists, verifying: $fileName"
@@ -944,7 +944,7 @@ function Install-CurrentUserPackages {
 $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AppxLift" Height="840" Width="1180" MinHeight="720" MinWidth="1050" WindowStartupLocation="CenterScreen" ResizeMode="CanResize" Background="#0B1220" Foreground="#E5E7EB">
+        Title="StoreLift" Height="840" Width="1180" MinHeight="720" MinWidth="1050" WindowStartupLocation="CenterScreen" ResizeMode="CanResize" Background="#0B1220" Foreground="#E5E7EB">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="#1D4ED8"/>
@@ -1036,7 +1036,7 @@ $xaml = @"
 
         <Border Grid.Row="0" Background="#0F1B33" CornerRadius="8" Padding="8,6" Margin="0,0,0,3" Height="58">
             <StackPanel>
-                <TextBlock Text="AppxLift" FontSize="20" FontWeight="Bold" Foreground="#BFDBFE"/>
+                <TextBlock Text="StoreLift" FontSize="20" FontWeight="Bold" Foreground="#BFDBFE"/>
                 <TextBlock Text="Search, resolve, download, verify, and install AppX/MSIX packages locally." FontSize="10" Foreground="#94A3B8" Margin="0,0,0,0"/>
             </StackPanel>
         </Border>
@@ -1246,7 +1246,7 @@ $script:SearchButton.Add_Click({
     }
     catch {
         Add-Log -Level Error -Message $_.Exception.Message
-        Show-AppxLiftMessage -Message $_.Exception.Message -Title "Search Error" -Icon Error | Out-Null
+        Show-StoreLiftMessage -Message $_.Exception.Message -Title "Search Error" -Icon Error | Out-Null
     }
     finally {
         Set-UiBusy -Busy $false
@@ -1269,7 +1269,7 @@ $script:UseManualButton.Add_Click({
     }
     catch {
         Write-Log -Level Error -Message $_.Exception.Message
-        Show-AppxLiftMessage -Message $_.Exception.Message -Title "Manual Input Error" -Icon Error | Out-Null
+        Show-StoreLiftMessage -Message $_.Exception.Message -Title "Manual Input Error" -Icon Error | Out-Null
     }
 })
 
@@ -1300,7 +1300,7 @@ $script:ResolveButton.Add_Click({
             $detail = "$detail (line $($_.InvocationInfo.ScriptLineNumber))"
         }
         Write-Log -Level Error -Message $detail
-        Show-AppxLiftMessage -Message $detail -Title "Preview Error" -Icon Error | Out-Null
+        Show-StoreLiftMessage -Message $detail -Title "Preview Error" -Icon Error | Out-Null
     }
     finally {
         Set-UiBusy -Busy $false
@@ -1346,7 +1346,7 @@ $script:DownloadButton.Add_Click({
             $detail = "$detail (line $($_.InvocationInfo.ScriptLineNumber))"
         }
         Write-Log -Level Error -Message $detail
-        Show-AppxLiftMessage -Message $detail -Title "Download Error" -Icon Error | Out-Null
+        Show-StoreLiftMessage -Message $detail -Title "Download Error" -Icon Error | Out-Null
     }
     finally {
         Set-UiBusy -Busy $false
@@ -1370,7 +1370,7 @@ $script:InstallButton.Add_Click({
             throw "Folder does not exist: $path"
         }
 
-        $confirm = Show-AppxLiftMessage `
+        $confirm = Show-StoreLiftMessage `
             -Message "Install AppX/MSIX package for the current user from:`n$path`n`nThis uses Add-AppxPackage and usually does not require Administrator." `
             -Title "Confirm Current User Install" `
             -Buttons YesNo `
@@ -1390,7 +1390,7 @@ $script:InstallButton.Add_Click({
     }
     catch {
         Write-Log -Level Error -Message $_.Exception.Message
-        Show-AppxLiftMessage -Message $_.Exception.Message -Title "Install Error" -Icon Error | Out-Null
+        Show-StoreLiftMessage -Message $_.Exception.Message -Title "Install Error" -Icon Error | Out-Null
     }
     finally {
         Set-UiBusy -Busy $false
@@ -1428,7 +1428,7 @@ $script:OpenFolderButton.Add_Click({
     }
     catch {
         Write-Log -Level Error -Message $_.Exception.Message
-        Show-AppxLiftMessage -Message $_.Exception.Message -Title "Open Folder Error" -Icon Error | Out-Null
+        Show-StoreLiftMessage -Message $_.Exception.Message -Title "Open Folder Error" -Icon Error | Out-Null
     }
 })
 
