@@ -16,6 +16,19 @@ StoreLift takes that idea further by combining it with my previous AppX installe
 
 The main goal is to keep this as a reusable one-file utility for myself and others, rather than a one-off installer for a single app.
 
+<img width="1153" height="817" alt="image" src="https://github.com/user-attachments/assets/e8e985d5-c07f-474b-ba65-0749adb38cd9" />
+
+<img width="330" height="116" alt="image" src="https://github.com/user-attachments/assets/7d4af865-14e6-4de7-b812-a78800ca493b" />
+
+## Basic Flow
+
+1. Search for an app, for example `paint`
+2. Select the Store result
+3. Preview the app package and dependencies
+4. Click **Download App + Dependencies**
+5. Optional: click **Install Current User**
+6. Use **Open Folder** to view downloaded files or Search the Windows taskbar/start menu to find the installed app
+
 
 ## What It Does
 
@@ -32,24 +45,6 @@ StoreLift provides a simple GUI for:
 Current user install is used so the tool can usually run without local admin permissions.
 
 
-## Winget Search
-
-StoreLift uses `winget` to search the Microsoft Store source after that the script parses the search results, extracts the Store ProductId, and builds the Store URL automatically.
-
-Instead of using `winget install`, StoreLift downloads the AppX/MSIX package files directly, verifies them, and installs them locally using `Add-AppxPackage`. 
-
-This is useful for testing, troubleshooting, offline installs, restricted Store environments, or cases where you want to inspect the package files before installing them.
-
-
-## Basic Flow
-
-1. Search for an app, for example `paint`
-2. Select the Store result
-3. Preview the app package and dependencies
-4. Click **Download App + Dependencies**
-5. Optional: click **Install Current User**
-6. Use **Open Folder** to view downloaded files
-7. Search the Windows taskbar/start menu to find the installed app
 
 
 ## Important Notes
@@ -71,9 +66,17 @@ If a download gets stuck or leaves a `BIT*.tmp` file behind, restart BITS. `Rest
 * [https://github.com/anguzz/powershell/tree/main/intune/HEVC-Appx-Installer](https://github.com/anguzz/powershell/tree/main/intune/HEVC-Appx-Installer)
 * [https://github.com/schrebra/Microsoft.Store.Appx.Downloader](https://github.com/schrebra/Microsoft.Store.Appx.Downloader)
 * [https://store.rg-adguard.net/](https://store.rg-adguard.net/)
-https://www.reddit.com/r/sysadmin/comments/1kywfm7/how_to_deal_with_hevc_after_eol_of_microsoft/
 
-# Winget install vs StoreLift
+## Winget Search
+
+StoreLift uses `winget` to search the Microsoft Store source after that the script parses the search results, extracts the Store ProductId, and builds the Store URL automatically.
+
+Instead of using `winget install`, StoreLift downloads the AppX/MSIX package files directly, verifies them, and installs them locally using `Add-AppxPackage`. 
+
+This is useful for testing, troubleshooting, offline installs, restricted Store environments, or cases where you want to inspect the package files before installing them.
+
+
+## Winget install vs StoreLift
 
 
 | Use case                                  |                                                Winget install |                  StoreLift |
