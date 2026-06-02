@@ -1,0 +1,702 @@
+sections:
+  section-1779227252332-5:
+    collapsed: true
+    order: 8
+    title: Top
+    widgetIds:
+    - note-1779302557612-5
+    - d33c23da-8015-4e52-848d-4fd01bc257a0
+  section-1779215912390-0:
+    collapsed: false
+    order: 0
+    title: Create Events From Scratch
+    widgetIds:
+    - note-1779216825437-1
+    - 3ea90249-37ed-45c8-8b9c-d0c26affbbe2
+  section-1779227261336-6:
+    collapsed: true
+    order: 9
+    title: Match
+    widgetIds:
+    - note-1779302565607-6
+    - 79ffd9d7-d194-4dc1-bf71-66ca6a1c8927
+  section-1779227217332-2:
+    collapsed: true
+    order: 5
+    title: Case Statements
+    widgetIds:
+    - note-1779302438605-2
+    - dee5665c-247f-438a-919e-c7c5bf36b9b0
+  section-1779227243330-4:
+    collapsed: true
+    order: 7
+    title: Sort
+    widgetIds:
+    - note-1779302549607-4
+    - 7a02c6df-8283-4d52-a3fb-87bb8264387b
+  section-1779227231343-3:
+    collapsed: true
+    order: 6
+    title: GroupBy
+    widgetIds:
+    - note-1779302533607-3
+    - 28aa636b-e8c3-4c89-b3b8-483beef1a1a6
+  section-1779227189332-0:
+    collapsed: true
+    order: 3
+    title: Eval :=
+    widgetIds:
+    - note-1779301957568-0
+    - 64eb2c07-00e2-44e2-b482-bf0cc80a8d42
+  section-1779218826457-2:
+    collapsed: true
+    order: 1
+    title: Wildcards
+    widgetIds:
+    - note-1779219069439-3
+    - f344697a-35f5-438d-b61c-766be537fef1
+  section-1779227209332-1:
+    collapsed: true
+    order: 4
+    title: In
+    widgetIds:
+    - note-1779302381605-1
+    - 7ac755c1-6b72-41e8-9102-44990a5eeeec
+  section-1779223033317-0:
+    collapsed: true
+    order: 2
+    title: Regex
+    widgetIds:
+    - note-1779223112317-1
+    - ba6ac803-5123-417f-9980-27a147391e94
+name: cql101_webinar
+updateFrequency: never
+timeSelector: {}
+sharedTimeInterval:
+  enabled: true
+  isLive: false
+  start: 5m
+widgets:
+  note-1779223112317-1:
+    x: 6
+    y: 0
+    height: 4
+    text: "**Regular expression** or **regex** is a powerful tool for filtering and\
+      \ extracting data. \n\nIf you are familiar with regex elsewhere, much of the\
+      \ knowledge should transfer over. Refer to the [Differences from Other Regex\
+      \ Implementations](https://library.humio.com/data-analysis/syntax-regex-diffs.html)\
+      \ page for how Next-Gen SIEM's regex differs from styles you may be familiar\
+      \ with.\n\nYou can use the **regex()** function in order to use regex, such\
+      \ as when you do not want to filter out non-matches by using the **strict=false**\
+      \ parameter. You can also use regex with **field=/$REGEX/** syntax.\n\nTo open\
+      \ the query in Advanced Event Search, Click the **three vertical dots ⋮** on\
+      \ the top right of the **Regex Examples** widget and select **Edit in search\
+      \ view**\n\n[regex() function documentation](https://library.humio.com/data-analysis/functions-regex.html)\n\
+      \        "
+    width: 6
+    title: Regex Notes
+    type: note
+  64eb2c07-00e2-44e2-b482-bf0cc80a8d42:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /* These two statements are equivalent! */
+      | @field := "Use := for eval!"
+      // | eval(@field="Use := for eval!")
+
+      /* Notice the following doesn't work, as it is looking for a field named "value" */
+      // | field := value
+
+      /* When using the values inside fields don't use quotes */
+      // | outcome := event.outcome
+      // | address := source.address
+
+      /* The field is assigned the result of the right side of the eval */
+      // | result := 5 + 7
+
+      /* This includes functions! */
+      // | result := format(format="%s %s", field=[event.action, event.outcome])
+      // | address := lower(source.address)
+    end: now
+    start: 15m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns:
+        '@rawstring':
+          hidden: true
+        '@timestamp':
+          hidden: true
+        '@timestamp.nanos':
+          hidden: true
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Eval Examples
+    isLive: false
+    type: query
+  note-1779302438605-2:
+    x: 6
+    y: 0
+    height: 5
+    text: "**Case statements** allow for conditional execution of CQL. They are similar\
+      \ to **switch/case** statements in other languages, combined with more traditional\
+      \ **if/else if/else** statements.\n\n```\n| case {\n    condition1 | outcome1;\n\
+      \    condition2 | outcome2;\n    * | catchall-outcome;\n}\n```\n\nOnly one condition\
+      \ within the case statement will be executed. They are evaluated top to bottom,\
+      \ so the first statement that evaluates to true is what gets executed.\n\nTo\
+      \ open the query in Advanced Event Search, Click the **three vertical dots ⋮\
+      ** on the top right of the **Regex Examples** widget and select **Edit in search\
+      \ view**\n\n[Case statement examples](https://library.humio.com/data-analysis/syntax-conditional.html#syntax-conditional-case-example)\n\
+      \        "
+    width: 6
+    title: Case Statement Notes
+    type: note
+  79ffd9d7-d194-4dc1-bf71-66ca6a1c8927:
+    x: 0
+    y: 0
+    height: 6
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /* To use a lookup file to enrich events, use the match() function */
+      // | match(file="cql101.csv", field=[source.address], column=[host])
+
+      /*
+        Note that the previous query filtered events that don't match
+        Use the "strict" parameter to control this behavior
+      */
+      // | match(file="cql101.csv", field=[source.address], column=[host], strict=false)
+
+      /* To only include certain fields from the lookup use the "include" parameter */
+      // | match(file="cql101.csv", field=[source.address], column=host, include=[zone])
+
+      /* To use glob matching use the "mode" parameter" */
+      | groupBy([user.email, source.address, event.action])
+      | match(file="cql101.csv", field=[source.address], column=host, mode=glob, strict=false)
+    end: now
+    start: 5m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns:
+        '@rawstring':
+          hidden: true
+        '@timestamp':
+          hidden: true
+        '@timestamp.nanos':
+          hidden: true
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Match Examples
+    isLive: false
+    type: query
+  28aa636b-e8c3-4c89-b3b8-483beef1a1a6:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /* groupBy() allows you to run functions on matching field values */
+      | groupBy([user.email])
+
+      /* You can group by multiple fields */
+      // | groupBy([user.email, source.address, event.outcome])
+
+      /*
+        By default groupBy() shows how many occurances of that value are in the data with the count() function
+        You can change this behavior with the function parameter
+      */
+      // | groupBy([user.email], function=[collect([source.address])])
+      // | groupBy([source.address], function=[count(field=user.email, as="Unique Users", distinct=true)])
+
+      /* You can even put another groupBy as the function! */
+      // | groupBy([source.address], function=[groupBy([user.email], function=[collect([event.outcome])])])
+
+      /* Use filtering and groupBy() to find excessive failed logins */
+      // | event.outcome = "failure" event.action = "login"
+      // | groupBy([user.email], function=[count(as="Failed_Logins")])
+      // | "Failed_Logins" > 3
+    end: now
+    start: 15m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns: {}
+      row-numbers-enabled: false
+    visualization: table-view
+    title: GroupBy Examples
+    isLive: false
+    type: query
+  note-1779301957568-0:
+    x: 6
+    y: 0
+    height: 4
+    text: "The **eval()** function is one of the most commonly used functions in CQL.\
+      \ Often used with the shorthand **:=** operator, it allows you to assign values\
+      \ to fields with a number of operations and functions.\n\n```\nfield:=value\n\
+      ``` \nis equivalent to \n```\neval(field=value)\n```\n\nBe careful! \n```\n\
+      myField:=value\n``` \nwill look for a field named **value** and put the contents\
+      \ into **myField**. \nThis is very different to \n```\nmyField:=\"value\"\n\
+      ```\nwhich assigns the string **value** to myField.\n\nTo open the query in\
+      \ Advanced Event Search, Click the **three vertical dots ⋮** on the top right\
+      \ of the **Eval Examples** widget and select **Edit in search view**\n\n[eval()\
+      \ function documentation](https://library.humio.com/data-analysis/functions-eval.html)\n\
+      \        "
+    width: 6
+    title: Eval Notes
+    type: note
+  f344697a-35f5-438d-b61c-766be537fef1:
+    x: 0
+    y: 0
+    description: Open me in by pressing the three vertical dots and selecting Edit
+      in search view
+    height: 4
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      // Wildcard at the end of a string
+      | user.email = john*
+      // | wildcard(field=user.email, pattern="john*")
+
+      // Wildcard at the beginning of a string
+      // | user.email = *@example.co
+
+      // Use != to exclude matching results
+      // | user.email != *example.co
+      // | source.address != VULN*
+
+      // Be careful, wildcarding is case insensitive by default!
+      // | user.email = ALEX*
+      // | wildcard(field=user.email, pattern="ALEX*", ignoreCase=true)
+    end: now
+    start: 5m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns:
+        '@rawstring':
+          hidden: true
+        '@timestamp':
+          hidden: true
+        '@timestamp.nanos':
+          hidden: true
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Wildcard Examples
+    isLive: false
+    type: query
+  note-1779302533607-3:
+    x: 6
+    y: 0
+    height: 4
+    text: "To open the query in Advanced Event Search, Click the **three vertical\
+      \ dots ⋮** on the top right of the **Regex Examples** widget and select **Edit\
+      \ in search view**\n\nEvery query language has some important functions that\
+      \ are used constantly, and **groupBy()** is one of those functions for CQL.\
+      \ It is very simple to use, but can do wonderfully complex grouping and calculations\
+      \ depending on what you need.\n\nChoose which fields to group on using the **field**\
+      \ parameter. Since it requires an array of fields, it can group on up to 20,000\
+      \ fields! \n\nBe default, the function returns a count of every time a field-value\
+      \ combination has appeared in the events and puts that into a field called **_count**.\
+      \ This can be changed by using the **function** parameter. Any aggregate function\
+      \ can be used, even another **groupBy()**! This is very advanced and won't be\
+      \ covered in the webinar, but feel free to play with it.\n\n[groupBy() function\
+      \ documentation](https://library.humio.com/data-analysis/functions-groupby.html)\n\
+      \        "
+    width: 6
+    title: GroupBy Notes
+    type: note
+  note-1779302557612-5:
+    x: 6
+    y: 0
+    height: 4
+    text: "\n\nTo open the query in Advanced Event Search, Click the **three vertical\
+      \ dots ⋮** on the top right of the **Regex Examples** widget and select **Edit\
+      \ in search view**\n\nThe **top()** function combines **groupBy()** and **sort()**\
+      \ all in one more efficient function. Side by side, **top()** will outperform\
+      \ the two function calls in most cases.\n\nIt also allows you to perform other\
+      \ options, such as using the **percent** parameter to show the percentage of\
+      \ the total count for each entry, and the **other** parameter to put all other\
+      \ values that aren't included in the output into their own row.\n\nIf you need\
+      \ any functions other than **count()** or **sum()** in your **groupBy()**, you\
+      \ will need to use **groupBy()** and **sort()** instead of **top()**. Keep on\
+      \ the lookout for when to make your queries more efficient using **top()**,\
+      \ but don't fret if you can't. It is more important that the query works than\
+      \ to be slightly more efficient!\n\n[top() function documentation](https://library.humio.com/data-analysis/functions-top.html)\n\
+      \        "
+    width: 6
+    title: Top Notes
+    type: note
+  note-1779302381605-1:
+    x: 6
+    y: 0
+    height: 5
+    text: "The **in()** function allows you to match events that have one of several\
+      \ values for a field.\n\n```\nevent.action=\"login\" OR event.action=\"logout\"\
+      \n``` \nis equivalent to \n```\nin(field=event.action, values=[\"login\", \"\
+      logout])\n```\n\nYou can use wildcards for the values \n```\nin(field=user.email,\
+      \ values=[\"john\\*\", \"\\*@example.co\"])\n```\n\nExclude values by putting\
+      \ **!** before the in function \n```\n!in(field=source.address, values=[\"HOST-01\"\
+      , \"HOST-02\"])\n``` \nwill exclude events with a source.address value of HOST-01\
+      \ or HOST-02.\n\nTo open the query in Advanced Event Search, Click the **three\
+      \ vertical dots ⋮** on the top right of the **In Examples** widget and select\
+      \ **Edit in search view**\n\n[in() function documentation](https://library.humio.com/data-analysis/functions-in.html)\n\
+      \        "
+    width: 6
+    title: In Notes
+    type: note
+  note-1779302565607-6:
+    x: 6
+    y: 0
+    height: 6
+    text: "To open the query in Advanced Event Search, Click the **three vertical\
+      \ dots ⋮** on the top right of the **Regex Examples** widget and select **Edit\
+      \ in search view**\n\nThe **match()** function allows you to take information\
+      \ in a lookup file (or [ad-hoc table](https://library.humio.com/data-analysis/query-joins-methods-adhoc-tables.html))\
+      \ to enrich data from a search. \n\nYou use the **field** argument to select\
+      \ which field should match up to the **column** parameter in the lookup file.\
+      \ Select which fields from the lookup to enrich the data with the **include**\
+      \ parameter. \n\nThe function also allows for glob and CIDR matching with the\
+      \ **mode** argument. This has a bunch of uses, but one of my favorites is to\
+      \ set default values using glob, such as with the example to the left! Instead\
+      \ of putting in a severity for every HOST machine, the lookup file has **HOST\\\
+      *** to give a value to every machine. Be careful, glob matches take priority\
+      \ over exact matches! If HOST-03 was high priority, we would need to change\
+      \ the lookup with every HOST machine in order to not present false data.\n\n\
+      By default the function removes rows that do not have matching columns in the\
+      \ lookup file. If you do not want to filter - you wish to perform a left join\
+      \ in other parlance - set the **strict** parameter to true.\n\n[match() function\
+      \ documentation](https://library.humio.com/data-analysis/functions-match.html)\n\
+      \        "
+    width: 6
+    title: Match notes
+    type: note
+  note-1779302549607-4:
+    x: 6
+    y: 0
+    height: 4
+    text: "To open the query in Advanced Event Search, Click the **three vertical\
+      \ dots ⋮** on the top right of the **Regex Examples** widget and select **Edit\
+      \ in search view**\n\nThe **sort()** function does exactly as it says, it sorts!\
+      \ Give it a field or multiple fields, and it will sort the output by those fields\
+      \ in the order you specify them. You can choose to **order** the sort in either\
+      \ an **ascending** or **descending** manner. You can also choose the **type**\
+      \ of data being sorted, so numbers will sort as numbers and strings will be\
+      \ sorted lexicographically.\n\n```\nsort([_count, user.email, event.action],\
+      \ type=[number, string, string], order=[desc, asc, asc])\n```\n\nThe function\
+      \ above sorts by _count first, then user.name, and finally event.action. We\
+      \ specify _count is a number, while user.name and event.action are strings.\
+      \ Finally we sort in a descending manner (Z-A, 9-0) on _count, then ascending\
+      \ (A-Z 0-9) for user.name and event.action.\n\n[sort() function documentation](https://library.humio.com/data-analysis/functions-sort.html)\n\
+      \        "
+    width: 6
+    title: Sort Notes
+    type: note
+  note-1779216825437-1:
+    x: 6
+    y: 0
+    height: 6
+    text: |
+      Welcome! This dashboard is meant to accompany the **CQL 101** webinar. Use the queries provided in these widgets in order to follow along during the class.
+
+      This is your personal copy, so you are encouraged to modify the queries and widgets in order to practice CQL!
+
+      ### The Dataset
+      This is an example dataset showing logins and logouts to servers. It includes the user's email, the machine that the action was performed on, the action, and the outcome. These are all normalized to CPS. Feel free to add to these fields and challenge yourself to use the appropriate CPS fields!
+
+      ### Event Creation Query
+      The query to the left utilizes the **createEvents()** function and the **kvParse()** function. This allows all of us to work from the same set of events, even if there is no event data ingested to Next-Gen SIEM!
+
+      This query will be the beginning of all of the other queries in the dashboard. If you're interested in understanding how the two functions in the query work, follow the documentation links below.
+
+      [createEvents() function documentation](https://library.humio.com/data-analysis/functions-createevents.html)
+
+      [kvParse() function documentation](https://library.humio.com/data-analysis/functions-kvparse.html)
+    width: 6
+    title: Introduction
+    type: note
+  ba6ac803-5123-417f-9980-27a147391e94:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /*
+        These two lines are the same!
+        Use the field=/$REGEX/ shorthand to call the regex function
+      */
+      | regex(field=user.email, regex="carla")
+      // |  user.email=/carla/
+
+      /* Perform case insensitive searches using the "i" flag */
+      // | source.address=/vuln/i
+
+      /* Extract information from fields using regex */
+      // | user.email=/(?<user.name>\w+)@/
+      // | user.email=/@(?<user.domain>.*)/
+
+      /* Extract multiple fields using a single regex statement - it is usually more efficient! */
+      // | user.email=/^(?<user.name>\w+)@(?<user.domain>.*)/
+
+      /* Use regex to search complex patterns */
+      // | source.address=/^(vuln|host)\-0[234]/i
+    end: now
+    start: 15m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns:
+        '@rawstring':
+          hidden: true
+        '@timestamp':
+          hidden: true
+        '@timestamp.nanos':
+          hidden: true
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Regex Examples
+    isLive: false
+    type: query
+  7ac755c1-6b72-41e8-9102-44990a5eeeec:
+    x: 0
+    y: 0
+    height: 5
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /* The following statements are equivalent */
+      // | user.email="john@example.co" OR user.email="carla@example.co"
+      | in(field="user.email", values=["john@example.co", "carla@example.co"])
+
+      /* You can also exclude results by prepending "!" */
+      // | !in(field="user.email", values=["john@example.co", "carla@example.co"])
+
+      /* You can wildcard inside of the function! */
+      // | in(field="source.address", values=["VULN*"])
+
+      /* Combine excluding and wildcard to find the odd email out */
+      // | !in(field="user.email", values=["*@example.co"])
+    end: now
+    start: 15m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns:
+        '@rawstring':
+          hidden: true
+        '@timestamp':
+          hidden: true
+        '@timestamp.nanos':
+          hidden: true
+      row-numbers-enabled: false
+    visualization: table-view
+    title: In Examples
+    isLive: false
+    type: query
+  dee5665c-247f-438a-919e-c7c5bf36b9b0:
+    x: 0
+    y: 0
+    height: 5
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /* Case statements function as conditionals */
+      | case {
+        user.email="*@example.co"
+          | user := "internal";
+
+        *
+          | user := "external";
+      }
+
+      /* Be careful - if there isn't a catch all "*" condition you will filter non-matches! */
+      // | case {
+      //   source.address = "TOP-SECRET-01"
+      //     | severity := "critical";
+
+      //   source.address = "VULN*"
+      //     | severity := "high";
+      // }
+
+      /* You can even nest case statements */
+      // | case {
+      //   source.address = "TOP-SECRET-01"
+      //     | case {
+      //       user.email = "john@example.co"
+      //         | access := "allowed";
+
+      //       *
+      //         | access := "denied";
+      //     }
+      // }
+    end: now
+    start: 15m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns:
+        '@rawstring':
+          hidden: true
+        '@timestamp':
+          hidden: true
+        '@timestamp.nanos':
+          hidden: true
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Case Statement Examples
+    isLive: false
+    type: query
+  3ea90249-37ed-45c8-8b9c-d0c26affbbe2:
+    x: 0
+    y: 0
+    description: This query uses the createEvents() function in order to provide events
+      for later queries.
+    height: 6
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents([
+        "user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01",
+        "user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02",
+        "user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03",
+        "user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04",
+        "user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05",
+        "user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01",
+        "user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01",
+        "user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02",
+        "user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02",
+        "user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02",
+        "user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02",
+        "user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02",
+        "user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"
+      ])
+
+      // Parse the data into field-value pairs
+      | kvParse()
+    end: now
+    start: 1d
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns: {}
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Event Creation Query
+    isLive: false
+    type: query
+  7a02c6df-8283-4d52-a3fb-87bb8264387b:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /*
+        You can sort with the sort function
+        By default it sorts ascending (Z-A, 9-0)
+      */
+      // | sort([source.address])
+
+      /* To change that, use the "order" parameter */
+      // | sort([source.address], order=asc)
+
+      /*
+        You can also sort by multiple fields
+        The order that you put the fields in is the order they sort
+      */
+      // | sort([source.address, user.email, event.outcome])
+
+      /* You'll often sort after aggregating */
+      | groupBy([user.email, event.action], function=[count(), collect(source.address)])
+      | sort([_count, user.email, event.action], type=[number, string, string], order=[desc, asc, asc])
+    end: now
+    start: 5m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns: {}
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Sort Examples
+    isLive: false
+    type: query
+  d33c23da-8015-4e52-848d-4fd01bc257a0:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      // Use the createEvents() function to create events
+      createEvents(["user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-01","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-02","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-03","user.email=john@example.co,event.action=login,event.outcome=failure,source.address=VULN-04","user.email=john@example.co,event.action=login,event.outcome=success,source.address=VULN-05","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-01","user.email=alex@example.co,event.action=login,event.outcome=success,source.address=HOST-02","user.email=alex@example.co,event.action=logout,event.outcome=success,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=carla@example.co,event.action=login,event.outcome=failure,source.address=HOST-02","user.email=hax0r@scattered.spider,event.action=login,event.outcome=failure,source.address=TOP-SECRET-01","user.email=hax0r@scattered.spider,event.action=login,event.outcome=success,source.address=TOP-SECRET-01"]) | kvParse()
+      // Don't change anything before this line!
+
+      /*
+        If you ever see the following lines, stop and replace it with top()!
+        Note that if you do any function other than count() in the groupBy(), you can't use top()
+      */
+      // | groupBy([user.email, source.address])
+      // | sort(_count)
+      // | top([user.email, source.address])
+
+      /* Very common to use top with the "limit" parameter for a top 3 */
+      | event.action="login"
+      | top([user.email], limit=3, as="Logins", percent=true, rest=others)
+      | percent:=format(format="%.2f%%", field=[percent])
+    end: now
+    start: 5m
+    width: 6
+    options:
+      cell-overflow: wrap-text
+      column-overflow: truncate
+      configured-columns: {}
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Top Examples
+    isLive: false
+    type: query
+  note-1779219069439-3:
+    x: 6
+    y: 0
+    height: 4
+    text: "**Wildcards** allow you to search for partial matches in text.\n\nYou can\
+      \ use the **wildcard()** function in order to search, but a much more common\
+      \ approach is to use short hand expressions to invoke the function.\n\nFor instance,\
+      \ searching for **user.email=john\\*** will return all events where the **user.email**\
+      \ field begins with the string **john**. Searching for **user.email=\\*example.co**\
+      \ will return all events where **user.email** ends with **example.co**. \n\n\
+      To open the query in Advanced Event Search, Click the **three vertical dots\
+      \ ⋮** on the top right of the **Wildcard Examples** widget and select **Edit\
+      \ in search view**\n\n[wildcard() function documentation](https://library.humio.com/data-analysis/functions-wildcard.html)\n\
+      \        "
+    width: 6
+    title: Wildcard Notes
+    type: note
+$schema: https://schemas.humio.com/dashboard/v0.23.0

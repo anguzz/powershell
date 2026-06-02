@@ -1,0 +1,6 @@
+host,zone,priority
+VULN-01,servers,medium
+VULN-02,servers,medium
+VULN-03,servers,medium
+HOST*,workstations,low
+TOP-SECRET-01,pci,critical
