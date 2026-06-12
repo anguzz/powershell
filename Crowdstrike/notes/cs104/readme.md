@@ -1,6 +1,6 @@
 
 
-## CrowdStrike 104 Endpoint security: Falcon Detections – Quick Notes
+## CrowdStrike 104 Endpoint security: Falcon Detections 
 
 ### Core Concept
 
