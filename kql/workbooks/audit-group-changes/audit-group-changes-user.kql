@@ -1,0 +1,35 @@
+AuditLogs
+| where TimeGenerated > ago(30d)
+| where OperationName in ("Add member to group", "Remove member from group")
+| extend TargetResources = todynamic(TargetResources)
+| mv-expand TR = TargetResources
+| extend ModifiedProperties = todynamic(TR.modifiedProperties)
+| mv-expand MP = ModifiedProperties
+| extend
+    PropertyName = tostring(MP.displayName),
+    NewValue = replace_string(tostring(MP.newValue), '"', ''),
+    MemberName = tostring(TR.displayName),
+    MemberUPN = tostring(TR.userPrincipalName),
+    TargetType = tostring(TR.type),
+    InitiatedByUser = tostring(InitiatedBy.user.userPrincipalName),
+    InitiatedByApp = tostring(InitiatedBy.app.displayName)
+| where TargetType == "User"
+| summarize
+    GroupName = anyif(NewValue, PropertyName == "Group.DisplayName"),
+    FallbackGroup = anyif(MemberName, TargetType == "Group"),
+    MemberName = any(MemberName),
+    MemberUPN = any(MemberUPN),
+    TargetType = any(TargetType),
+    InitiatedByUser = any(InitiatedByUser),
+    InitiatedByApp = any(InitiatedByApp)
+    by TimeGenerated, OperationName, Id
+| where InitiatedByApp !in 
+("Workplace Analytics", "Microsoft Approval Management","MS-PIM", "Microsoft Substrate Management",
+ "AAD Lifecycle Management","Azure AD Identity Governance - User Management","Microsoft Teams Services")
+| extend
+    Group = coalesce(GroupName, FallbackGroup),
+    AffectedObject = coalesce(MemberUPN, MemberName),
+    InitiatedBy = coalesce(InitiatedByUser, InitiatedByApp)
+| where isempty("{Username}") or AffectedObject contains "{Username}"
+| project TimeGenerated, OperationName, Group, AffectedObject, InitiatedBy
+| sort by TimeGenerated desc
