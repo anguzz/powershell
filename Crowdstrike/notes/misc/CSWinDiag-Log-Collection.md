@@ -178,3 +178,5 @@ Verify:
 - The host's Response Policy has synced
 
 
+docs:
+https://docs.crowdstrike.com/r/en-US/a5kj6wfu/v0abcacf
