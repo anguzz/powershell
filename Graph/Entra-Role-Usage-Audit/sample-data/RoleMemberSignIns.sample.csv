@@ -1,0 +1,74 @@
+AccountDisplayName,AccountUpn,Application,ApplicationId,ResourceDisplayName,SignIns,ActiveDays,FirstSeen,LastSeen
+Kira Pereira,kira.pereira@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,257,13,2026-09-01T09:37:00,2026-09-02T17:28:00
+Grace Varga,grace.varga@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,172,21,2026-10-13T03:03:00,2026-10-21T15:56:00
+Grace Varga,grace.varga@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,257,8,2026-09-28T21:20:00,2026-10-20T04:49:00
+Grace Varga,grace.varga@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,121,18,2026-10-13T07:05:00,2026-10-21T07:57:00
+Wes Zimmerman,wes.zimmerman@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,334,8,2026-10-16T20:26:00,2026-10-20T21:08:00
+Wes Castillo,wes.castillo@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,262,18,2026-10-02T00:08:00,2026-10-17T10:27:00
+Priya Varga,priya.varga@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,247,16,2026-10-12T11:21:00,2026-10-16T22:14:00
+Priya Varga,priya.varga@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,108,16,2026-10-13T07:45:00,2026-10-16T20:09:00
+Bruno Fischer,bruno.fischer@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,171,15,2026-10-05T22:35:00,2026-10-20T15:38:00
+Bruno Fischer,bruno.fischer@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,297,20,2026-10-05T10:33:00,2026-10-16T18:54:00
+Bruno Fischer,bruno.fischer@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,185,20,2026-10-10T00:30:00,2026-10-20T21:52:00
+Zane Jensen,zane.jensen@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,130,13,2026-10-12T06:33:00,2026-10-18T11:59:00
+Grace Quinlan,grace.quinlan@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,96,7,2026-10-05T14:08:00,2026-10-22T09:13:00
+Finn Strand,finn.strand@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,177,7,2026-10-12T07:15:00,2026-10-18T01:43:00
+Grace Dawson,grace.dawson@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,52,18,2026-09-26T12:10:00,2026-10-21T22:34:00
+Iris Baxter,iris.baxter@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,154,17,2026-08-24T07:50:00,2026-09-02T06:45:00
+Maya Baxter,maya.baxter@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,144,7,2026-09-28T17:19:00,2026-10-17T01:09:00
+Maya Baxter,maya.baxter@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,26,22,2026-09-27T07:42:00,2026-10-22T13:24:00
+Silas Sato,silas.sato@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,242,2,2026-09-27T09:17:00,2026-10-21T11:59:00
+Silas Sato,silas.sato@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,131,18,2026-09-30T02:10:00,2026-10-16T02:59:00
+Victor Kowalski,victor.kowalski@contoso.com,Microsoft Sentinel,ffb0c89d-30ce-4eed-b0a6-f34131ea5987,Log Analytics API,1,18,2026-09-24T08:17:00,2026-10-16T17:33:00
+Rosa Galloway,rosa.galloway@contoso.com,Microsoft Defender portal,f85937e7-c58f-4cc9-b955-3e7c50be69e1,Microsoft Threat Protection,316,7,2026-09-29T19:16:00,2026-10-17T17:11:00
+Quentin Abbott,quentin.abbott@contoso.com,Microsoft Sentinel,ffb0c89d-30ce-4eed-b0a6-f34131ea5987,Log Analytics API,94,15,2026-09-29T05:53:00,2026-10-20T12:13:00
+Quentin Abbott,quentin.abbott@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,158,12,2026-10-06T23:08:00,2026-10-19T08:57:00
+Maya Whitaker,maya.whitaker@contoso.com,Microsoft Defender portal,f85937e7-c58f-4cc9-b955-3e7c50be69e1,Microsoft Threat Protection,23,1,2026-08-29T09:51:00,2026-09-07T03:03:00
+Rhea Baxter,rhea.baxter@contoso.com,Microsoft Defender portal,f85937e7-c58f-4cc9-b955-3e7c50be69e1,Microsoft Threat Protection,69,13,2026-10-04T21:01:00,2026-10-19T22:22:00
+Noah Abbott,noah.abbott@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,230,12,2026-10-17T19:16:00,2026-10-21T04:29:00
+Iris Nakamura,iris.nakamura@contoso.com,Microsoft Defender portal,f85937e7-c58f-4cc9-b955-3e7c50be69e1,Microsoft Threat Protection,342,22,2026-10-06T09:05:00,2026-10-17T16:44:00
+Hassan Quinlan,hassan.quinlan@contoso.com,Microsoft Graph PowerShell,afa024ee-231a-4058-9edc-5d016de40789,Microsoft Graph,165,19,2026-09-29T14:22:00,2026-10-22T03:59:00
+Felix Zimmerman,felix.zimmerman@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,69,2,2026-10-08T22:45:00,2026-10-22T12:19:00
+Dana Yilmaz,dana.yilmaz@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,309,8,2026-10-17T18:25:00,2026-10-22T07:28:00
+Yusuf Pereira,yusuf.pereira@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,137,15,2026-10-05T16:08:00,2026-10-20T07:13:00
+Yusuf Pereira,yusuf.pereira@contoso.com,Microsoft Graph PowerShell,afa024ee-231a-4058-9edc-5d016de40789,Microsoft Graph,202,5,2026-10-17T22:35:00,2026-10-20T18:47:00
+Yusuf Pereira,yusuf.pereira@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,285,10,2026-09-28T07:15:00,2026-10-19T19:17:00
+Gemma Petrov,gemma.petrov@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,196,8,2026-10-04T14:23:00,2026-10-16T04:08:00
+Rhea Rasmussen,rhea.rasmussen@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,275,11,2026-09-25T11:04:00,2026-10-16T21:53:00
+Vera Pereira,vera.pereira@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,121,18,2026-10-05T23:23:00,2026-10-21T04:33:00
+Diego Castillo,diego.castillo@contoso.com,Microsoft Defender for Cloud Apps,cde73a36-96db-4eec-9109-2f810ff0fe43,Microsoft Cloud App Security,224,3,2026-09-27T13:51:00,2026-10-17T20:46:00
+Jonah Dawson,jonah.dawson@contoso.com,Microsoft Entra admin center,50a3e8cc-e746-4d2d-9708-4dff507ff1ed,Microsoft Graph,273,20,2026-10-16T14:06:00,2026-10-19T18:00:00
+Jonah Dawson,jonah.dawson@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,170,11,2026-10-14T14:33:00,2026-10-16T09:39:00
+Quentin Iversen,quentin.iversen@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,336,18,2026-10-02T05:06:00,2026-10-19T00:35:00
+Maya Brennan,maya.brennan@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,182,13,2026-08-31T07:52:00,2026-09-08T10:17:00
+Aiden Zimmerman,aiden.zimmerman@contoso.com,Azure CLI,95bb4e11-0c23-491d-910b-b7aed8b0a287,Azure Resource Manager,74,11,2026-10-13T12:22:00,2026-10-20T07:20:00
+Chloe Yilmaz,chloe.yilmaz@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,199,6,2026-09-30T17:12:00,2026-10-17T09:23:00
+Chloe Yilmaz,chloe.yilmaz@contoso.com,Visual Studio Code,37a6ee2f-b2a3-44ff-ad4d-22f60b22fcff,Azure Resource Manager,115,1,2026-10-12T05:41:00,2026-10-21T03:30:00
+Dana Rasmussen,dana.rasmussen@contoso.com,Azure CLI,95bb4e11-0c23-491d-910b-b7aed8b0a287,Azure Resource Manager,53,18,2026-08-11T01:09:00,2026-08-28T22:57:00
+Dana Rasmussen,dana.rasmussen@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,143,17,2026-08-29T14:52:00,2026-09-12T10:17:00
+Felix Thorne,felix.thorne@contoso.com,Azure Portal,12f11fb0-0a0c-41c1-9f75-78891754d5e1,Azure Resource Manager,13,21,2026-10-10T00:14:00,2026-10-16T01:32:00
+Felix Thorne,felix.thorne@contoso.com,Visual Studio Code,37a6ee2f-b2a3-44ff-ad4d-22f60b22fcff,Azure Resource Manager,313,1,2026-10-02T10:04:00,2026-10-21T17:06:00
+Felix Thorne,felix.thorne@contoso.com,Azure CLI,95bb4e11-0c23-491d-910b-b7aed8b0a287,Azure Resource Manager,153,10,2026-10-06T18:03:00,2026-10-18T15:37:00
+Zane Haddad,zane.haddad@contoso.com,Azure CLI,95bb4e11-0c23-491d-910b-b7aed8b0a287,Azure Resource Manager,220,12,2026-10-13T04:42:00,2026-10-21T09:38:00
+Felix Castillo,felix.castillo@contoso.com,Microsoft Teams admin center,d8e0e40d-23fd-455d-af05-856005dba4a2,Microsoft Teams Services,189,14,2026-09-28T14:01:00,2026-10-17T06:21:00
+Felix Castillo,felix.castillo@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,140,16,2026-10-07T00:51:00,2026-10-20T01:02:00
+Olive Moreau,olive.moreau@contoso.com,Microsoft Teams admin center,d8e0e40d-23fd-455d-af05-856005dba4a2,Microsoft Teams Services,231,12,2026-08-01T17:44:00,2026-08-25T05:51:00
+Grace Castillo,grace.castillo@contoso.com,Microsoft Teams admin center,d8e0e40d-23fd-455d-af05-856005dba4a2,Microsoft Teams Services,18,11,2026-10-01T18:57:00,2026-10-17T20:05:00
+Grace Castillo,grace.castillo@contoso.com,Exchange admin center,1476d9e3-d41a-43ab-a501-e653d4d6131d,Office 365 Exchange Online,347,14,2026-10-15T13:46:00,2026-10-19T23:08:00
+Grace Castillo,grace.castillo@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,291,21,2026-10-02T00:58:00,2026-10-21T16:44:00
+Talia Abbott,talia.abbott@contoso.com,Exchange admin center,1476d9e3-d41a-43ab-a501-e653d4d6131d,Office 365 Exchange Online,223,18,2026-10-01T17:04:00,2026-10-18T12:36:00
+Talia Abbott,talia.abbott@contoso.com,Microsoft Teams admin center,d8e0e40d-23fd-455d-af05-856005dba4a2,Microsoft Teams Services,194,15,2026-10-19T13:22:00,2026-10-21T04:08:00
+Talia Abbott,talia.abbott@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Microsoft 365 Admin Portal,327,15,2026-10-07T20:17:00,2026-10-21T00:05:00
+Elena Petrov,elena.petrov@contoso.com,Microsoft Graph PowerShell,afa024ee-231a-4058-9edc-5d016de40789,Microsoft Graph,303,22,2026-09-28T12:16:00,2026-10-18T19:44:00
+Elena Petrov,elena.petrov@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,144,21,2026-09-23T01:13:00,2026-10-17T16:44:00
+Quentin Novak,quentin.novak@contoso.com,Microsoft Graph PowerShell,afa024ee-231a-4058-9edc-5d016de40789,Microsoft Graph,302,2,2026-10-13T21:54:00,2026-10-16T21:09:00
+Quentin Novak,quentin.novak@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,284,13,2026-10-10T01:38:00,2026-10-19T13:04:00
+Priya Castillo,priya.castillo@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,82,12,2026-09-28T01:19:00,2026-10-18T18:29:00
+Hugo Petrov,hugo.petrov@contoso.com,Microsoft Intune admin center,48d6f0cd-ae7b-410e-8be4-8dee190ae0fe,Microsoft Intune,153,19,2026-08-19T14:18:00,2026-08-27T20:25:00
+Hugo Petrov,hugo.petrov@contoso.com,Microsoft Graph PowerShell,afa024ee-231a-4058-9edc-5d016de40789,Microsoft Graph,7,11,2026-08-23T17:23:00,2026-09-02T07:06:00
+Olive Zimmerman,olive.zimmerman@contoso.com,Microsoft Graph PowerShell,afa024ee-231a-4058-9edc-5d016de40789,Microsoft Graph,164,1,2026-10-12T11:16:00,2026-10-18T09:38:00
+Wes Valdez,wes.valdez@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Office 365 Reports,333,7,2026-10-16T07:08:00,2026-10-18T12:11:00
+Wes Valdez,wes.valdez@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,9,1,2026-10-15T08:09:00,2026-10-18T09:24:00
+Jasper Moreau,jasper.moreau@contoso.com,Microsoft Purview portal,c52ad016-256f-434a-b3aa-4c9ee712f2fc,Microsoft Purview,182,8,2026-08-11T18:47:00,2026-08-26T05:00:00
+Jasper Moreau,jasper.moreau@contoso.com,Microsoft 365 admin center,66b67bd1-5ee3-4e6a-bcee-9daf3d303302,Office 365 Reports,132,20,2026-08-17T20:25:00,2026-08-30T12:50:00
+Backup Automation,svc-backup@contoso.com,Exchange Online PowerShell,420054ff-c569-4488-b0fa-80fe69f6b766,Office 365 Exchange Online,24,13,2026-10-19T04:59:00,2026-10-21T18:37:00

@@ -1,0 +1,35 @@
+// ------------------------------------------------------------
+// Role member sign-in activity (Microsoft Defender XDR Advanced Hunting)
+//
+// Summarizes successful Entra ID sign-ins for a list of users by
+// application and resource. Run 01-Get-EntraRoleMembership.ps1 to
+// generate a copy of this query with the RoleMembers list populated,
+// or paste UPNs in manually.
+//
+// Notes:
+//   - Advanced Hunting typically retains ~30 days of data. Larger
+//     lookbacks return only what is available.
+//   - EntraIdSignInEvents requires Entra ID P2. Older tenants may
+//     expose the same data as AADSignInEventsBeta.
+//   - Export results as CSV for 03-Merge-RoleUsage.ps1.
+// ------------------------------------------------------------
+let Lookback = 30d;
+let RoleMembers = dynamic([
+    "user1@contoso.com",
+    "user2@contoso.com"
+]);
+EntraIdSignInEvents
+| where Timestamp >= ago(Lookback)
+| where AccountUpn in~ (RoleMembers)
+| where ErrorCode == 0
+| summarize
+    SignIns = count(),
+    ActiveDays = dcount(startofday(Timestamp)),
+    FirstSeen = min(Timestamp),
+    LastSeen = max(Timestamp)
+    by AccountDisplayName,
+       AccountUpn,
+       Application,
+       ApplicationId,
+       ResourceDisplayName
+| order by AccountDisplayName asc, SignIns desc
